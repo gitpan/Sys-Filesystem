@@ -14,7 +14,7 @@ use Carp qw(croak);
 # Globals and constants
 
 use vars qw($VERSION);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.8 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.10 $ =~ /(\d+)/g);
 
 
 
@@ -33,7 +33,7 @@ sub new {
 	#$args{xtab} ||= '/etc/lib/nfs/xtab';
 
 	# Default fstab and mtab layout
-	my @fstab_keys = qw(device device_to_fsck mount_point fs_vfstype fs_freq fs_passno fs_mntops);
+	my @fstab_keys = qw(device device_to_fsck mount_point fs_vfstype fs_freq mount_at_boot fs_mntops);
 	my @mtab_keys = qw(device mount_point fs_vfstype fs_mntops time);
 
 	# Read the fstab
@@ -83,35 +83,107 @@ sub new {
 1;
 
 
-
-__END__
-
 ###############################################################################
-# CVS changelog
+# POD
 
-$Log: Solaris.pm,v $
-Revision 1.8  2004/09/30 14:13:04  nicolaw
-Copied special fs logic to the mnttab loop also
+=pod
 
-Revision 1.7  2004/09/30 14:02:15  nicolaw
-Added mntfs and autofs as special filesystems
+=head1 NAME
 
-Revision 1.6  2004/09/30 13:25:07  nicolaw
-Added mnttab support (see man mnttab)
+Sys::Filesystem::Solaris - Return Solaris filesystem information to Sys::Filesystem
 
-Revision 1.5  2004/09/28 17:01:17  nicolaw
-*** empty log message ***
+=head1 VERSION
 
-Revision 1.4  2004/09/28 16:58:51  nicolaw
-*** empty log message ***
+$Revision: 1.10 $
 
-Revision 1.3  2004/09/28 16:55:19  nicolaw
-*** empty log message ***
+=head1 FILESYSTEM PROPERTIES
 
-Revision 1.2  2004/09/28 16:52:30  nicolaw
-*** empty log message ***
+The following is a list of filesystem properties which may
+be queried as methods through the parent Sys::Filesystem object.
 
-Revision 1.1  2004/09/28 16:47:11  nicolaw
-*** empty log message ***
+=over 4
 
+=item device
+
+Resource name.
+
+=item device_to_fsck
+
+The raw device to fsck.
+
+=item mount_point
+
+The default mount directory.
+
+=item fs_vfstype
+
+The  name of the file system type.
+
+=item fs_freq
+
+The number used by fsck to decide whether to check the file system
+automatically.
+
+=item mount_at_boot
+
+Whether the file system should be mounted automatically by mountall.
+
+=item fs_mntops
+
+The file system mount options.
+
+=item time
+
+The time at which the file system was mounted.
+
+=back
+
+=head1 SEE ALSO
+
+Solaris::DeviceTree
+
+=head1 BUGS
+
+Probably. Please email me a patch if you find something ghastly.
+
+=head1 AUTHOR
+
+Nicola Worthington <nicolaworthington@msn.com>
+
+http://www.nicolaworthington.com/
+
+$Author: nicolaw $
+
+=head1 CHANGELOG
+
+    $Log: Solaris.pm,v $
+    Revision 1.10  2004/10/06 15:27:37  nicolaw
+    Type in POD
+
+    Revision 1.9  2004/10/06 15:24:29  nicolaw
+    Added some POD to document filesystem property access methods
+
+    Revision 1.8  2004/09/30 14:13:04  nicolaw
+    Copied special fs logic to the mnttab loop also
+    
+    Revision 1.7  2004/09/30 14:02:15  nicolaw
+    Added mntfs and autofs as special filesystems
+    
+    Revision 1.6  2004/09/30 13:25:07  nicolaw
+    Added mnttab support (see man mnttab)
+    
+    Revision 1.5  2004/09/28 17:01:17  nicolaw
+    *** empty log message ***
+    
+    Revision 1.4  2004/09/28 16:58:51  nicolaw
+    *** empty log message ***
+    
+    Revision 1.3  2004/09/28 16:55:19  nicolaw
+    *** empty log message ***
+    
+    Revision 1.2  2004/09/28 16:52:30  nicolaw
+    *** empty log message ***
+    
+    Revision 1.1  2004/09/28 16:47:11  nicolaw
+    *** empty log message ***
 

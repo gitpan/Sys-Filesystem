@@ -16,7 +16,7 @@ use Carp qw(croak cluck confess);
 
 use constant DEBUG => $ENV{DEBUG} ? 1 : 0;
 use vars qw($VERSION $AUTOLOAD);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.9 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.10 $ =~ /(\d+)/g);
 
 
 
@@ -42,7 +42,7 @@ sub new {
 	my $self = { %args };
 	$self->{osname} = $OSNAME;
 	my @query_order = ($self->{osname});
-	push @query_order, 'Unix' unless $self->{osname} eq 'Win32';
+	push @query_order, $self->{osname} eq 'MSWin32' ? 'Win32' : 'Unix';
 	push @query_order, 'Dummy';
 
 	# Try and query
@@ -73,8 +73,8 @@ sub new {
 			Package => __PACKAGE__,
 			Version => $VERSION,
 			Author => '$Author: nicolaw $',
-			Revision => '$Revision: 1.9 $',
-			Id => '$Id: Filesystem.pm,v 1.9 2004/10/05 14:12:38 nicolaw Exp $',
+			Revision => '$Revision: 1.10 $',
+			Id => '$Id: Filesystem.pm,v 1.10 2004/10/06 15:25:00 nicolaw Exp $',
 		};
 
 	# Debug
@@ -217,7 +217,7 @@ Sys::Filesystem - Retrieve list of filesystems and their properties
 
 =head1 VERSION
 
-$Revision: 1.9 $
+$Revision: 1.10 $
 
 =head1 SYNOPSIS
 
@@ -375,7 +375,7 @@ Maintained by Nicola Worthington.
 
 The Unix module is intended to provide a "best guess" failover result to the
 main Sys::Filesystem module if no suitable platform specific module can be
-found, and the platform is not 'Win32'.
+found, and the platform is not 'MSWin32'.
 
 =head2 Linux
 
@@ -494,6 +494,9 @@ __END__
 # CVS changelog
 
 $Log: Filesystem.pm,v $
+Revision 1.10  2004/10/06 15:25:00  nicolaw
+Fix from Win32 to MSWin32
+
 Revision 1.9  2004/10/05 14:12:38  nicolaw
 POD whitespace fix
 
