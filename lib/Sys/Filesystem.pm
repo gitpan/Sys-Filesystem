@@ -16,7 +16,7 @@ use Carp qw(croak cluck confess);
 
 use constant DEBUG => $ENV{DEBUG} ? 1 : 0;
 use vars qw($VERSION $AUTOLOAD);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.10 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.11 $ =~ /(\d+)/g);
 
 
 
@@ -47,7 +47,7 @@ sub new {
 
 	# Try and query
 	for (@query_order) {
-		$self->{filesystems} ||= eval sprintf('use %s::%s; %s::%s->new(%%args);',
+		$self->{filesystems} ||= eval sprintf('require %s::%s; %s::%s->new(%%args);',
 						__PACKAGE__, _caps($_),
 						__PACKAGE__, _caps($_)
 					);
@@ -56,9 +56,9 @@ sub new {
 
 	# Filesystem property aliases
 	$self->{aliases} = {
-			device          => [ qw(fs_file) ],
-			filesystem      => [ qw(fs_spec) ],
-			mount_point     => [ qw(fs_spec) ],
+			device          => [ qw(fs_spec) ],
+			filesystem      => [ qw(fs_file) ],
+			mount_point     => [ qw(fs_file) ],
 			type            => [ qw(fs_vfstype) ],
 			format          => [ qw(fs_vfstype) ],
 			options         => [ qw(fs_mntops) ],
@@ -73,8 +73,8 @@ sub new {
 			Package => __PACKAGE__,
 			Version => $VERSION,
 			Author => '$Author: nicolaw $',
-			Revision => '$Revision: 1.10 $',
-			Id => '$Id: Filesystem.pm,v 1.10 2004/10/06 15:25:00 nicolaw Exp $',
+			Revision => '$Revision: 1.11 $',
+			Id => '$Id: Filesystem.pm,v 1.11 2004/10/06 16:24:58 nicolaw Exp $',
 		};
 
 	# Debug
@@ -217,7 +217,7 @@ Sys::Filesystem - Retrieve list of filesystems and their properties
 
 =head1 VERSION
 
-$Revision: 1.10 $
+$Revision: 1.11 $
 
 =head1 SYNOPSIS
 
@@ -494,6 +494,9 @@ __END__
 # CVS changelog
 
 $Log: Filesystem.pm,v $
+Revision 1.11  2004/10/06 16:24:58  nicolaw
+*** empty log message ***
+
 Revision 1.10  2004/10/06 15:25:00  nicolaw
 Fix from Win32 to MSWin32
 

@@ -4,6 +4,7 @@ lib/Sys/Filesystem/Linux.pm
 lib/Sys/Filesystem/Unix.pm
 lib/Sys/Filesystem/Dummy.pm
 lib/Sys/Filesystem/Solaris.pm
+lib/Sys/Filesystem/Cygwin.pm
 TODO
 README
 MANIFEST

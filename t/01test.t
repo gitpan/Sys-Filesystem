@@ -14,10 +14,16 @@ ok(my @regular_filesystems = $fs->regular_filesystems, 'Get list of regular file
 ok(my @filesystems = $fs->filesystems, 'Get list of filesystems');
 #warn "Filesystems are: @filesystems\n";
 
+#warn "\n\n";
 for my $filesystem (@filesystems) {
-	ok(my $device = $fs->device($filesystem), "Get device for $filesystem");
-	ok(my $options = $fs->options($filesystem), "Get options for $filesystem");
-	ok(my $type = $fs->type($filesystem), "Get type for $filesystem");
-#	warn "$filesystem is mounted on $device\n";
+        ok(my $device = $fs->device($filesystem), "Get device for $filesystem");
+#        warn "$filesystem -> device=$device\n";
+
+        ok(my $options = $fs->options($filesystem), "Get options for $filesystem");
+#        warn "$filesystem -> options=$options\n";
+
+        ok(my $type = $fs->type($filesystem), "Get type for $filesystem");
+#        warn "$filesystem -> type=$type\n";
+#	warn "\n";
 }
 
