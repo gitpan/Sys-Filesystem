@@ -3,6 +3,7 @@ lib/Sys/Filesystem/Win32.pm
 lib/Sys/Filesystem/Linux.pm
 lib/Sys/Filesystem/Unix.pm
 lib/Sys/Filesystem/Dummy.pm
+lib/Sys/Filesystem/Darwin.pm
 lib/Sys/Filesystem/Solaris.pm
 lib/Sys/Filesystem/Cygwin.pm
 TODO
@@ -13,3 +14,4 @@ INSTALL
 COPYING
 Changes
 t/01test.t
+META.yml                                 Module meta-data (added by MakeMaker)

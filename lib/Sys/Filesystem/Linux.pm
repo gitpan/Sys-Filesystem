@@ -14,7 +14,7 @@ use Carp qw(croak);
 # Globals and constants
 
 use vars qw($VERSION);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.9 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.10 $ =~ /(\d+)/g);
 
 
 
@@ -58,7 +58,7 @@ sub new {
 	my $mtab = new FileHandle;
 	if ($mtab->open($args{mtab})) {
 		while (<$mtab>) {
-			next if /^\s*#/;
+			next if /^\s*\#/;
 			my @vals = split(/\s+/, $_);
 			delete $self->{$vals[1]}->{unmounted} if exists $self->{$vals[1]}->{unmounted};
 			$self->{$vals[1]}->{mounted} = 1;
@@ -95,7 +95,7 @@ Sys::Filesystem::Linux - Return Linux filesystem information to Sys::Filesystem
 
 =head1 VERSION
 
-$Revision: 1.9 $
+$Revision: 1.10 $
 
 =head1 FILESYSTEM PROPERTIES
 
@@ -195,6 +195,9 @@ $Author: nicolaw $
 =head1 CHANGELOG
 
     $Log: Linux.pm,v $
+    Revision 1.10  2004/12/01 11:16:38  nicolaw
+    *** empty log message ***
+
     Revision 1.9  2004/10/06 15:34:58  nicolaw
     *** empty log message ***
 

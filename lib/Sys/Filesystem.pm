@@ -16,7 +16,7 @@ use Carp qw(croak cluck confess);
 
 use constant DEBUG => $ENV{DEBUG} ? 1 : 0;
 use vars qw($VERSION $AUTOLOAD);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.11 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.12 $ =~ /(\d+)/g);
 
 
 
@@ -73,8 +73,8 @@ sub new {
 			Package => __PACKAGE__,
 			Version => $VERSION,
 			Author => '$Author: nicolaw $',
-			Revision => '$Revision: 1.11 $',
-			Id => '$Id: Filesystem.pm,v 1.11 2004/10/06 16:24:58 nicolaw Exp $',
+			Revision => '$Revision: 1.12 $',
+			Id => '$Id: Filesystem.pm,v 1.12 2005/01/13 23:37:07 nicolaw Exp $',
 		};
 
 	# Debug
@@ -217,7 +217,7 @@ Sys::Filesystem - Retrieve list of filesystems and their properties
 
 =head1 VERSION
 
-$Revision: 1.11 $
+$Revision: 1.12 $
 
 =head1 SYNOPSIS
 
@@ -331,6 +331,20 @@ available to query under Linux.
 Returns the friendly name of the filesystem. This will usually be the same
 name as appears in the list returned by the filesystems() method.
 
+=item label()
+
+Returns the fileystem label.
+
+This functionality may need to be retrofitted to some original OS specific
+helper modules as of Sys::Filesystem 1.12.
+
+=item volume()
+
+Returns the volume that the filesystem belongs to or is mounted on.
+
+This functionality may need to be retrofitted to some original OS specific
+helper modules as of Sys::Filesystem 1.12.
+
 =item device()
 
 Returns the physical device that the filesystem is connected to.
@@ -377,17 +391,27 @@ The Unix module is intended to provide a "best guess" failover result to the
 main Sys::Filesystem module if no suitable platform specific module can be
 found, and the platform is not 'MSWin32'.
 
+This module requires additional work to improve it's guestimation abilities.
+
 =head2 Linux
 
 Maintained by Nicola Worthington.
 
+=head2 Darwin
+
+Written and maintained by Christian Renz <crenz@web42.com>.
+
 =head2 Solaris
 
-Initial revision written by Nicola Worthington.
+Initial revision written by Nicola Worthington. Please contact me if you
+would like to maintain this.
 
 =head2 Win32
 
-Initial revision written by Nicola Worthington.
+Initial revision written by Nicola Worthington. Please contact me if you
+would like to maintain this.
+
+This isn't written yet. It's on the top of the (very slow) TODO list.
 
 =head2 OS Identifiers
 
@@ -463,7 +487,7 @@ perlport(1) Solaris::DeviceTree Win32::DriveInfo
 
 =head1 TODO
 
-Add support for Windows, AIX, FreeBSD, HP-UX, Linux, Solaris and Tru64.
+Add support for Windows, AIX, FreeBSD, HP-UX and Tru64.
 
 =head1 BUGS
 
@@ -494,6 +518,9 @@ __END__
 # CVS changelog
 
 $Log: Filesystem.pm,v $
+Revision 1.12  2005/01/13 23:37:07  nicolaw
+Updated POD.
+
 Revision 1.11  2004/10/06 16:24:58  nicolaw
 *** empty log message ***
 
