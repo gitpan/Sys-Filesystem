@@ -1,4 +1,5 @@
 lib/Sys/Filesystem.pm
+lib/Sys/Filesystem/AIX.pm
 lib/Sys/Filesystem/Win32.pm
 lib/Sys/Filesystem/Linux.pm
 lib/Sys/Filesystem/Unix.pm

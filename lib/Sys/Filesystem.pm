@@ -16,7 +16,7 @@ use Carp qw(croak cluck confess);
 
 use constant DEBUG => $ENV{DEBUG} ? 1 : 0;
 use vars qw($VERSION $AUTOLOAD);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.13 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.14 $ =~ /(\d+)/g);
 
 
 
@@ -56,11 +56,11 @@ sub new {
 
 	# Filesystem property aliases
 	$self->{aliases} = {
-			device          => [ qw(fs_spec) ],
-			filesystem      => [ qw(fs_file) ],
-			mount_point     => [ qw(fs_file) ],
+			device          => [ qw(fs_spec dev) ],
+			filesystem      => [ qw(fs_file mount_point) ],
+			mount_point     => [ qw(fs_file filesystem) ],
 			type            => [ qw(fs_vfstype) ],
-			format          => [ qw(fs_vfstype) ],
+			format          => [ qw(fs_vfstype vfs) ],
 			options         => [ qw(fs_mntops) ],
 			check_frequency => [ qw(fs_freq) ],
 			check_order     => [ qw(fs_passno) ],
@@ -75,8 +75,8 @@ sub new {
 			Package => __PACKAGE__,
 			Version => $VERSION,
 			Author => '$Author: nicolaw $',
-			Revision => '$Revision: 1.13 $',
-			Id => '$Id: Filesystem.pm,v 1.13 2005/01/26 14:25:45 nicolaw Exp $',
+			Revision => '$Revision: 1.14 $',
+			Id => '$Id: Filesystem.pm,v 1.14 2005/01/30 18:10:41 nicolaw Exp $',
 		};
 
 	# Debug
@@ -224,7 +224,7 @@ Sys::Filesystem - Retrieve list of filesystems and their properties
 
 =head1 VERSION
 
-$Revision: 1.13 $
+$Revision: 1.14 $
 
 =head1 SYNOPSIS
 
@@ -464,6 +464,11 @@ Written and maintained by Christian Renz <crenz@web42.com>.
 Initial revision written by Nicola Worthington. Please contact me if you
 would like to maintain this.
 
+=head2 AIX
+
+Initial revision written by Nicola Worthington. Please contact me if you
+would like to maintain this.
+
 =head2 Win32
 
 Initial revision written by Nicola Worthington. Please contact me if you
@@ -542,6 +547,8 @@ Christian Renz <crenz@web42.com> is the maintainer of Sys::Filesystem::Darwin.
 Brad Greenlee <brad@footle.org> for suggesting and patching for the
 filesystem(device => "string") method functionality.
 
+http://publib.boulder.ibm.com/infocenter/pseries/index.jsp?topic=/com.ibm.aix.doc/files/aixfiles/filesystems.htm
+
 http://www.unixguide.net/unixguide.shtml
 
 =head1 SEE ALSO
@@ -586,6 +593,9 @@ __END__
 # CVS changelog
 
 $Log: Filesystem.pm,v $
+Revision 1.14  2005/01/30 18:10:41  nicolaw
+Added some new filesystem property aliases and reference to AIX helper module
+
 Revision 1.13  2005/01/26 14:25:45  nicolaw
 Added extra documentation and the device option for the filesystems
 method.
