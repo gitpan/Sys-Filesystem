@@ -1,3 +1,7 @@
+1.08
+	Added regular_filesystems() method
+	Added autofs and mntfs as special filesystems for Solaris
+
 1.07
 	Added solaris mnttab support
 	Fixed an AUTOLOAD and DESTROY issue

@@ -16,7 +16,7 @@ use Carp qw(croak cluck confess);
 
 use constant DEBUG => $ENV{DEBUG} ? 1 : 0;
 use vars qw($VERSION $AUTOLOAD);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.7 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.8 $ =~ /(\d+)/g);
 
 
 
@@ -73,8 +73,8 @@ sub new {
 			Package => __PACKAGE__,
 			Version => $VERSION,
 			Author => '$Author: nicolaw $',
-			Revision => '$Revision: 1.7 $',
-			Id => '$Id: Filesystem.pm,v 1.7 2004/09/30 13:12:00 nicolaw Exp $',
+			Revision => '$Revision: 1.8 $',
+			Id => '$Id: Filesystem.pm,v 1.8 2004/09/30 14:03:43 nicolaw Exp $',
 		};
 
 	# Debug
@@ -109,7 +109,8 @@ sub filesystems {
 	} else {
 		for my $fs (sort(keys(%{$self->{filesystems}}))) {
 			for my $requirement (keys %{$params}) {
-				if (exists $self->{filesystems}->{$fs}->{$requirement}) {
+				if ((defined $params->{$requirement} && exists $self->{filesystems}->{$fs}->{$requirement}) ||
+				    (!defined $params->{$requirement} && !exists $self->{filesystems}->{$fs}->{$requirement})) {
 					push @filesystems, $fs;
 					last;
 				}
@@ -134,6 +135,11 @@ sub unmounted_filesystems {
 sub special_filesystems {
 	my $self = shift;
 	return $self->filesystems(special => 1);
+}
+
+sub regular_filesystems {
+	my $self = shift;
+	return $self->filesystems(special => undef);
 }
 
 sub DESTROY {}
@@ -211,7 +217,7 @@ Sys::Filesystem - Retrieve list of filesystems and their properties
 
 =head1 VERSION
 
-$Revision: 1.7 $
+$Revision: 1.8 $
 
 =head1 SYNOPSIS
 
@@ -302,6 +308,10 @@ being mounted.
 
 Returns a list of all fileystems which are considered special. This will
 usually contain meta and swap partitions like /proc and /dev/shm on Linux.
+
+=item regular_filesystems()
+
+Returns a list of all filesystems which are not considered to be special.
 
 =back
 
@@ -484,6 +494,9 @@ __END__
 # CVS changelog
 
 $Log: Filesystem.pm,v $
+Revision 1.8  2004/09/30 14:03:43  nicolaw
+Added the regular_filesystems() method
+
 Revision 1.7  2004/09/30 13:12:00  nicolaw
 Added a DESTROY stub so that AUTO_LOAD doesn't catch it and complain that
 it doesn't have a filename to play with

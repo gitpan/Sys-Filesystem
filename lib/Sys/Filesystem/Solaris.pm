@@ -14,7 +14,7 @@ use Carp qw(croak);
 # Globals and constants
 
 use vars qw($VERSION);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.6 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.8 $ =~ /(\d+)/g);
 
 
 
@@ -47,7 +47,7 @@ sub new {
 				$vals[$i] = '' unless defined $vals[$i];
 			}
 			$self->{$vals[2]}->{unmounted} = 1;
-			$self->{$vals[2]}->{special} = 1 if grep(/^$vals[3]$/,qw(swap proc tmpfs nfs));
+			$self->{$vals[2]}->{special} = 1 if grep(/^$vals[3]$/,qw(swap proc tmpfs nfs mntfs autofs));
 			for (my $i = 0; $i < @fstab_keys; $i++) {
 				$self->{$vals[2]}->{$fstab_keys[$i]} = $vals[$i];
 			}
@@ -65,6 +65,7 @@ sub new {
 			my @vals = split(/\s+/, $_);
 			delete $self->{$vals[1]}->{unmounted} if exists $self->{$vals[1]}->{unmounted};
 			$self->{$vals[1]}->{mounted} = 1;
+			$self->{$vals[1]}->{special} = 1 if grep(/^$vals[2]$/,qw(swap proc tmpfs nfs mntfs autofs));
 			for (my $i = 0; $i < @mtab_keys; $i++) {
 				$self->{$vals[1]}->{$mtab_keys[$i]} = $vals[$i];
 			}
@@ -89,6 +90,12 @@ __END__
 # CVS changelog
 
 $Log: Solaris.pm,v $
+Revision 1.8  2004/09/30 14:13:04  nicolaw
+Copied special fs logic to the mnttab loop also
+
+Revision 1.7  2004/09/30 14:02:15  nicolaw
+Added mntfs and autofs as special filesystems
+
 Revision 1.6  2004/09/30 13:25:07  nicolaw
 Added mnttab support (see man mnttab)
 
