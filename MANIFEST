@@ -1,0 +1,14 @@
+lib/Sys/Filesystem.pm
+lib/Sys/Filesystem/Win32.pm
+lib/Sys/Filesystem/Linux.pm
+lib/Sys/Filesystem/Unix.pm
+lib/Sys/Filesystem/Dummy.pm
+lib/Sys/Filesystem/Solaris.pm
+TODO
+README
+MANIFEST
+Makefile.PL
+INSTALL
+COPYING
+Changes
+t/01test.t
