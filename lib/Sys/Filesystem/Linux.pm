@@ -14,7 +14,7 @@ use Carp qw(croak);
 # Globals and constants
 
 use vars qw($VERSION);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.5 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.6 $ =~ /(\d+)/g);
 
 
 
@@ -44,7 +44,7 @@ sub new {
 			$self->{$vals[1]}->{mount_point} = $vals[1];
 			$self->{$vals[1]}->{device} = $vals[0];
 			$self->{$vals[1]}->{unmounted} = 1;
-			$self->{$vals[1]}->{special} = 1 if grep(/^$vals[2]$/,qw(swap proc));
+			$self->{$vals[1]}->{special} = 1 if grep(/^$vals[2]$/,qw(swap proc devpts tempfs));
 			for (my $i = 0; $i < @keys; $i++) {
 				$self->{$vals[1]}->{$keys[$i]} = $vals[$i];
 			}
@@ -64,6 +64,7 @@ sub new {
 			$self->{$vals[1]}->{mounted} = 1;
 			$self->{$vals[1]}->{mount_point} = $vals[1];
 			$self->{$vals[1]}->{device} = $vals[0];
+			$self->{$vals[1]}->{special} = 1 if grep(/^$vals[2]$/,qw(swap proc devpts tempfs));
 			for (my $i = 0; $i < @keys; $i++) {
 				$self->{$vals[1]}->{$keys[$i]} = $vals[$i];
 			}
@@ -88,6 +89,9 @@ __END__
 # CVS changelog
 
 $Log: Linux.pm,v $
+Revision 1.6  2004/10/05 14:12:49  nicolaw
+Fixed detection of some special filesystem types
+
 Revision 1.5  2004/09/28 16:45:11  nicolaw
 *** empty log message ***
 

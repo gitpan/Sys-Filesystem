@@ -1,3 +1,6 @@
+1.09
+	Updated Linux.pm to properly detect some more special fs types
+
 1.08
 	Added regular_filesystems() method
 	Added autofs and mntfs as special filesystems for Solaris

@@ -16,7 +16,7 @@ use Carp qw(croak cluck confess);
 
 use constant DEBUG => $ENV{DEBUG} ? 1 : 0;
 use vars qw($VERSION $AUTOLOAD);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.8 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.9 $ =~ /(\d+)/g);
 
 
 
@@ -60,7 +60,7 @@ sub new {
 			filesystem      => [ qw(fs_spec) ],
 			mount_point     => [ qw(fs_spec) ],
 			type            => [ qw(fs_vfstype) ],
-			format          => [ qw(fs_vfs_type) ],
+			format          => [ qw(fs_vfstype) ],
 			options         => [ qw(fs_mntops) ],
 			check_frequency => [ qw(fs_freq) ],
 			check_order     => [ qw(fs_passno) ],
@@ -73,8 +73,8 @@ sub new {
 			Package => __PACKAGE__,
 			Version => $VERSION,
 			Author => '$Author: nicolaw $',
-			Revision => '$Revision: 1.8 $',
-			Id => '$Id: Filesystem.pm,v 1.8 2004/09/30 14:03:43 nicolaw Exp $',
+			Revision => '$Revision: 1.9 $',
+			Id => '$Id: Filesystem.pm,v 1.9 2004/10/05 14:12:38 nicolaw Exp $',
 		};
 
 	# Debug
@@ -217,7 +217,7 @@ Sys::Filesystem - Retrieve list of filesystems and their properties
 
 =head1 VERSION
 
-$Revision: 1.8 $
+$Revision: 1.9 $
 
 =head1 SYNOPSIS
 
@@ -435,7 +435,7 @@ the same name as ^O in title caps. Thus 'openbsd' becomes 'Openbsd.pm'.
     MS-DOS        dos        ?
     PC-DOS        dos        ?
     OS/2          os2        ?
-    Windows 3.1   ?          ?      0      3 01
+    Windows 3.1   ?          ?                 0      3 01
     Windows 95    MSWin32    MSWin32-x86       1      4 00
     Windows 98    MSWin32    MSWin32-x86       1      4 10
     Windows ME    MSWin32    MSWin32-x86       1      ?
@@ -444,7 +444,7 @@ the same name as ^O in title caps. Thus 'openbsd' becomes 'Openbsd.pm'.
     Windows NT    MSWin32    MSWin32-ppc       2      4 xx
     Windows 2000  MSWin32    MSWin32-x86       2      5 xx
     Windows XP    MSWin32    MSWin32-x86       2      ?
-    Windows CE    MSWin32    ?      3
+    Windows CE    MSWin32    ?                 3
     Cygwin        cygwin     ?
     
     OS            $^O        $Config{archname}
@@ -494,6 +494,9 @@ __END__
 # CVS changelog
 
 $Log: Filesystem.pm,v $
+Revision 1.9  2004/10/05 14:12:38  nicolaw
+POD whitespace fix
+
 Revision 1.8  2004/09/30 14:03:43  nicolaw
 Added the regular_filesystems() method
 
