@@ -16,7 +16,7 @@ use Carp qw(croak cluck confess);
 
 use constant DEBUG => $ENV{DEBUG} ? 1 : 0;
 use vars qw($VERSION $AUTOLOAD);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.12 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.13 $ =~ /(\d+)/g);
 
 
 
@@ -65,6 +65,8 @@ sub new {
 			check_frequency => [ qw(fs_freq) ],
 			check_order     => [ qw(fs_passno) ],
 			boot_order      => [ qw(fs_mntno) ],
+			volume          => [ qw(fs_volume fs_vol vol) ],
+			label           => [ qw(fs_label) ],
 		};
 
 	# Information
@@ -73,8 +75,8 @@ sub new {
 			Package => __PACKAGE__,
 			Version => $VERSION,
 			Author => '$Author: nicolaw $',
-			Revision => '$Revision: 1.12 $',
-			Id => '$Id: Filesystem.pm,v 1.12 2005/01/13 23:37:07 nicolaw Exp $',
+			Revision => '$Revision: 1.13 $',
+			Id => '$Id: Filesystem.pm,v 1.13 2005/01/26 14:25:45 nicolaw Exp $',
 		};
 
 	# Debug
@@ -98,6 +100,10 @@ sub filesystems {
 	# Check we've got something sane passed
 	croak 'Odd number of elements passed when even number was expected' if @_ % 2;
 	my $params = { @_ };
+	for my $param (keys %{$params}) {
+		croak "Illegal paramater '$param' passed to filesystems() method"
+			unless grep(/^$param$/, qw(mounted unmounted special device));
+	}
 
 	my @filesystems = ();
 
@@ -109,7 +115,8 @@ sub filesystems {
 	} else {
 		for my $fs (sort(keys(%{$self->{filesystems}}))) {
 			for my $requirement (keys %{$params}) {
-				if ((defined $params->{$requirement} && exists $self->{filesystems}->{$fs}->{$requirement}) ||
+				if ((defined $params->{$requirement} && exists $self->{filesystems}->{$fs}->{$requirement}) &&
+				    $self->{filesystems}->{$fs}->{$requirement} eq $params->{$requirement} ||
 				    (!defined $params->{$requirement} && !exists $self->{filesystems}->{$fs}->{$requirement})) {
 					push @filesystems, $fs;
 					last;
@@ -217,7 +224,7 @@ Sys::Filesystem - Retrieve list of filesystems and their properties
 
 =head1 VERSION
 
-$Revision: 1.12 $
+$Revision: 1.13 $
 
 =head1 SYNOPSIS
 
@@ -225,6 +232,7 @@ $Revision: 1.12 $
     use warnings;
     use Sys::Filesystem ();
     
+    # Method 1
     my $fs = new Sys::Filesystem;
     my @filesystems = $fs->filesystems();
     for (@filesystems) {
@@ -235,12 +243,16 @@ $Revision: 1.12 $
                    );
     }
     
+    # Method 2
     my $weird_fs = Sys::Filesystem->new(
                           fstab => "/etc/weird/vfstab.conf",
                           mtab => "/etc/active_mounts",
                           xtab => "/etc/nfs/mounts"
                     );
     my @weird_filesystems = $weird_fs->filesystems();
+    
+    # Method 3 (nice but naughty)
+    my @filesystems = Sys::Filesystem->filesystems();
 
 =head1 DESCRIPTION
 
@@ -292,7 +304,53 @@ therefore this option may be ignored on some systems.
 
 =item filesystems()
 
-Returns a list of all filesystem.
+Returns a list of all filesystem. May accept an optional list of key pair
+values in order to filter/restrict the results which are returned. Valid
+values are as follows:
+
+=over 4
+
+=item device => "string"
+
+Returns only filesystems that are mounted using the device of "string".
+For example:
+
+    my $fdd_filesytem = Sys::Filesystem->filesystems(device => "/dev/fd0");
+
+=item mounted => 1
+
+Returns only filesystems which can be confirmed as actively mounted.
+(Filesystems which are mounted).
+
+The mounted_filesystems() method is an alias for this syntax.
+
+=item unmounted => 1
+
+Returns only filesystems which cannot be confirmed as actively mounted.
+(Filesystems which are not mounted).
+
+The unmounted_filesystems() method is an alias for this syntax.
+
+=item special => 1
+
+Returns only filesystems which are regarded as special in some way. A
+filesystem is marked as special by the operating specific helper
+module. For example, a tmpfs type filesystem on one operating system
+might be regarded as a special filesystem, but not on others. Consult
+the documentation of the operating system specific helper module for
+further information about your system. (Sys::Filesystem::Linux for Linux
+or Sys::Filesystem::Solaris for Solaris etc).
+
+The special_filesystems() method is an alias for this syntax.
+
+=item regular => undef
+
+Returns only fileystems which are not regarded as special. (Normal
+filesystems).
+
+The regular_filesystems() method is an alias for this syntax.
+
+=back
 
 =item mounted_filesystems()
 
@@ -479,6 +537,11 @@ the same name as ^O in title caps. Thus 'openbsd' becomes 'Openbsd.pm'.
 
 =head1 ACKNOWLEDGEMENTS
 
+Christian Renz <crenz@web42.com> is the maintainer of Sys::Filesystem::Darwin.
+
+Brad Greenlee <brad@footle.org> for suggesting and patching for the
+filesystem(device => "string") method functionality.
+
 http://www.unixguide.net/unixguide.shtml
 
 =head1 SEE ALSO
@@ -487,7 +550,8 @@ perlport(1) Solaris::DeviceTree Win32::DriveInfo
 
 =head1 TODO
 
-Add support for Windows, AIX, FreeBSD, HP-UX and Tru64.
+Add support for Windows, AIX, FreeBSD, HP-UX and Tru64. Please contact me
+if you would like to provide code for these operating systems.
 
 =head1 BUGS
 
@@ -498,6 +562,10 @@ Probably. Please email me a patch if you find something ghastly.
 Nicola Worthington <nicolaworthington@msn.com>
 
 http://www.nicolaworthington.com/
+
+http://search.cpan.org/~NICOLAW/
+
+http://freshmeat.net/users/nicolaw/
 
 $Author: nicolaw $
 
@@ -518,6 +586,10 @@ __END__
 # CVS changelog
 
 $Log: Filesystem.pm,v $
+Revision 1.13  2005/01/26 14:25:45  nicolaw
+Added extra documentation and the device option for the filesystems
+method.
+
 Revision 1.12  2005/01/13 23:37:07  nicolaw
 Updated POD.
 
