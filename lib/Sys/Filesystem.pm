@@ -16,7 +16,7 @@ use Carp qw(croak cluck confess);
 
 use constant DEBUG => $ENV{DEBUG} ? 1 : 0;
 use vars qw($VERSION $AUTOLOAD);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.6 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.7 $ =~ /(\d+)/g);
 
 
 
@@ -73,8 +73,8 @@ sub new {
 			Package => __PACKAGE__,
 			Version => $VERSION,
 			Author => '$Author: nicolaw $',
-			Revision => '$Revision: 1.6 $',
-			Id => '$Id: Filesystem.pm,v 1.6 2004/09/29 12:01:23 nicolaw Exp $',
+			Revision => '$Revision: 1.7 $',
+			Id => '$Id: Filesystem.pm,v 1.7 2004/09/30 13:12:00 nicolaw Exp $',
 		};
 
 	# Debug
@@ -135,6 +135,8 @@ sub special_filesystems {
 	my $self = shift;
 	return $self->filesystems(special => 1);
 }
+
+sub DESTROY {}
 
 sub AUTOLOAD {
 	my $self = shift;
@@ -209,7 +211,7 @@ Sys::Filesystem - Retrieve list of filesystems and their properties
 
 =head1 VERSION
 
-$Revision: 1.6 $
+$Revision: 1.7 $
 
 =head1 SYNOPSIS
 
@@ -482,6 +484,10 @@ __END__
 # CVS changelog
 
 $Log: Filesystem.pm,v $
+Revision 1.7  2004/09/30 13:12:00  nicolaw
+Added a DESTROY stub so that AUTO_LOAD doesn't catch it and complain that
+it doesn't have a filename to play with
+
 Revision 1.6  2004/09/29 12:01:23  nicolaw
 Added aliases and condition of Unix module not if Win32
 

@@ -14,7 +14,7 @@ use Carp qw(croak);
 # Globals and constants
 
 use vars qw($VERSION);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.5 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.6 $ =~ /(\d+)/g);
 
 
 
@@ -29,11 +29,12 @@ sub new {
 
 	# Defaults
 	$args{fstab} ||= '/etc/vfstab';
-	#$args{mtab} ||= '/etc/mtab';
+	$args{mtab} ||= '/etc/mnttab';
 	#$args{xtab} ||= '/etc/lib/nfs/xtab';
 
 	# Default fstab and mtab layout
-	my @keys = qw(device device_to_fsck mount_point fs_vfstype fs_freq fs_passno fs_mntops);
+	my @fstab_keys = qw(device device_to_fsck mount_point fs_vfstype fs_freq fs_passno fs_mntops);
+	my @mtab_keys = qw(device mount_point fs_vfstype fs_mntops time);
 
 	# Read the fstab
 	my $fstab = new FileHandle;
@@ -42,13 +43,13 @@ sub new {
 			next if /^\s*#/;
 			next if /^\s*$/;
 			my @vals = split(/\s+/, $_);
-			for (my $i = 0; $i < @keys; $i++) {
+			for (my $i = 0; $i < @fstab_keys; $i++) {
 				$vals[$i] = '' unless defined $vals[$i];
 			}
-#			$self->{$vals[2]}->{unmounted} = 1;
-			$self->{$vals[2]}->{special} = 1 if grep(/^$vals[3]$/,qw(swap proc));
-			for (my $i = 0; $i < @keys; $i++) {
-				$self->{$vals[2]}->{$keys[$i]} = $vals[$i];
+			$self->{$vals[2]}->{unmounted} = 1;
+			$self->{$vals[2]}->{special} = 1 if grep(/^$vals[3]$/,qw(swap proc tmpfs nfs));
+			for (my $i = 0; $i < @fstab_keys; $i++) {
+				$self->{$vals[2]}->{$fstab_keys[$i]} = $vals[$i];
 			}
 		}
 		$fstab->close;
@@ -56,34 +57,22 @@ sub new {
 		croak "Unable to open fstab file ($args{fstab})\n";
 	}
 
-##device         device          mount           FS      fsck    mount   mount
-##to mount       to fsck         point           type    pass    at boot options
-##
-#fd      -       /dev/fd fd      -       no      -
-#/proc   -       /proc   proc    -       no      -
-#/dev/dsk/c0t0d0s3       -       -       swap    -       no      -
-#/dev/dsk/c0t0d0s0       /dev/rdsk/c0t0d0s0      /       ufs     1       no      -
-#/dev/dsk/c0t0d0s6       /dev/rdsk/c0t0d0s6      /usr    ufs     1       no      logging
-
-
-#	# Read the mtab
-#	my $mtab = new FileHandle;
-#	if ($mtab->open($args{mtab})) {
-#		while (<$mtab>) {
-#			next if /^\s*#/;
-#			my @vals = split(/\s+/, $_);
-#			delete $self->{$vals[1]}->{unmounted} if exists $self->{$vals[1]}->{unmounted};
-#			$self->{$vals[1]}->{mounted} = 1;
-#			$self->{$vals[1]}->{mount_point} = $vals[1];
-#			$self->{$vals[1]}->{device} = $vals[0];
-#			for (my $i = 0; $i < @keys; $i++) {
-#				$self->{$vals[1]}->{$keys[$i]} = $vals[$i];
-#			}
-#		}
-#		$mtab->close;
-#	} else {
-#		croak "Unable to open mtab file ($args{mtab})\n";
-#	}
+	# Read the mtab
+	my $mtab = new FileHandle;
+	if ($mtab->open($args{mtab})) {
+		while (<$mtab>) {
+			next if /^\s*#/;
+			my @vals = split(/\s+/, $_);
+			delete $self->{$vals[1]}->{unmounted} if exists $self->{$vals[1]}->{unmounted};
+			$self->{$vals[1]}->{mounted} = 1;
+			for (my $i = 0; $i < @mtab_keys; $i++) {
+				$self->{$vals[1]}->{$mtab_keys[$i]} = $vals[$i];
+			}
+		}
+		$mtab->close;
+	} else {
+		croak "Unable to open mtab file ($args{mtab})\n";
+	}
 
         # Bless and return
         bless($self,$class);
@@ -100,6 +89,9 @@ __END__
 # CVS changelog
 
 $Log: Solaris.pm,v $
+Revision 1.6  2004/09/30 13:25:07  nicolaw
+Added mnttab support (see man mnttab)
+
 Revision 1.5  2004/09/28 17:01:17  nicolaw
 *** empty log message ***
 

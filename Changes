@@ -1,2 +1,9 @@
+1.07
+	Added solaris mnttab support
+	Fixed an AUTOLOAD and DESTROY issue
+
+1.06
+	Added alias support and more POD docs
+
 1.04
 	Initial release to get the code out there
