@@ -16,7 +16,7 @@ use Carp qw(croak cluck confess);
 
 use constant DEBUG => $ENV{DEBUG} ? 1 : 0;
 use vars qw($VERSION $AUTOLOAD);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.4 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.6 $ =~ /(\d+)/g);
 
 
 
@@ -41,7 +41,12 @@ sub new {
 	# How to query
 	my $self = { %args };
 	$self->{osname} = $OSNAME;
-	for (($self->{osname},'Uinx','Dummy')) {
+	my @query_order = ($self->{osname});
+	push @query_order, 'Unix' unless $self->{osname} eq 'Win32';
+	push @query_order, 'Dummy';
+
+	# Try and query
+	for (@query_order) {
 		$self->{filesystems} ||= eval sprintf('use %s::%s; %s::%s->new(%%args);',
 						__PACKAGE__, _caps($_),
 						__PACKAGE__, _caps($_)
@@ -49,14 +54,27 @@ sub new {
 		cluck($@) if $@;
 	}
 
+	# Filesystem property aliases
+	$self->{aliases} = {
+			device          => [ qw(fs_file) ],
+			filesystem      => [ qw(fs_spec) ],
+			mount_point     => [ qw(fs_spec) ],
+			type            => [ qw(fs_vfstype) ],
+			format          => [ qw(fs_vfs_type) ],
+			options         => [ qw(fs_mntops) ],
+			check_frequency => [ qw(fs_freq) ],
+			check_order     => [ qw(fs_passno) ],
+			boot_order      => [ qw(fs_mntno) ],
+		};
+
 	# Information
 	$self->{software} = {
 			Caller => [ caller ],
 			Package => __PACKAGE__,
 			Version => $VERSION,
 			Author => '$Author: nicolaw $',
-			Revision => '$Revision: 1.4 $',
-			Id => '$Id: Filesystem.pm,v 1.4 2004/09/28 16:35:31 nicolaw Exp $',
+			Revision => '$Revision: 1.6 $',
+			Id => '$Id: Filesystem.pm,v 1.6 2004/09/29 12:01:23 nicolaw Exp $',
 		};
 
 	# Debug
@@ -105,7 +123,7 @@ sub filesystems {
 
 sub mounted_filesystems {
 	my $self = shift;
-	return $self->filesystems(mount_point => 1);
+	return $self->filesystems(mounted => 1);
 }
 
 sub unmounted_filesystems {
@@ -127,13 +145,24 @@ sub AUTOLOAD {
 
 	(my $name = $AUTOLOAD) =~ s/.*://;
 
+	# No such filesystem
 	unless (exists $self->{filesystems}->{$fs}) {
 		croak "No such filesystem";
+
+	# Look for the property
 	} else {
+		# Found the property
 		if (exists $self->{filesystems}->{$fs}->{$name}) {
 			return $self->{filesystems}->{$fs}->{$name};
-		} else {
-			return undef;
+
+		# Didn't find the property, but check any aliases
+		} elsif (exists $self->{aliases}->{$name}) {
+			for my $alias (@{$self->{aliases}->{$name}}) {
+				# Found the Alias
+				if (exists $self->{filesystems}->{$fs}->{$alias}) {
+					return $self->{filesystems}->{$fs}->{$alias};
+				}
+			}
 		}
 	}
 
@@ -180,31 +209,237 @@ Sys::Filesystem - Retrieve list of filesystems and their properties
 
 =head1 VERSION
 
-$Revision: 1.4 $
+$Revision: 1.6 $
 
 =head1 SYNOPSIS
 
+    use strict;
+    use warnings;
+    use Sys::Filesystem ();
+    
+    my $fs = new Sys::Filesystem;
+    my @filesystems = $fs->filesystems();
+    for (@filesystems) {
+        printf("%s is a %s filesystem mounted on %s\n",
+                          $fs->mount_point($_),
+                          $fs->format($_),
+                          $fs->device($_)
+                   );
+    }
+    
+    my $weird_fs = Sys::Filesystem->new(
+                          fstab => "/etc/weird/vfstab.conf",
+                          mtab => "/etc/active_mounts",
+                          xtab => "/etc/nfs/mounts"
+                    );
+    my @weird_filesystems = $weird_fs->filesystems();
+
 =head1 DESCRIPTION
+
+Sys::Filesystem is intended to be a portable interface to list and query
+filesystem names and their properties. At the time of writing there were only
+Solaris and Win32 modules available on CPAN to perform this kind of operation.
+This module hopes to provide a consistant API to list all, mounted, unmounted
+and special filesystems on a system, and query as many properties as possible
+with common aliases wherever possible.
 
 =head1 METHODS
 
 =over 4
 
+=item new()
+
+Creates a new Sys::Filesystem object. new() accepts 3 optional key pair values
+to help or force where mount information is gathered from. These values are
+not otherwise defaulted by the main Sys::Filesystem object, but left to the
+platform specific helper modules to determine as an exercise of common sense.
+
 =over 4
 
-=item new()
+=item fstab
+
+Specify the full path and filename of the filesystem table (or fstab for
+short).
+
+=item mtab
+
+Specify the full path and filename of the mounted filesystem table (or mtab
+for short). Not all platforms have such a file and so this option may be
+ignored on some systems.
+
+=item xtab
+
+Specify the full path and filename of the mounted NFS filesystem table
+(or xtab for short). This is usually only pertinant to Unix bases systems.
+Not all helper modules will query NFS mounts as a seperate exercise, and
+therefore this option may be ignored on some systems.
+
+=back
+
+=back
+
+=head2 Listing Filesystems
+
+=over 4
 
 =item filesystems()
 
+Returns a list of all filesystem.
+
 =item mounted_filesystems()
+
+Returns a list of all filesystems which can be verified as currently
+being mounted.
 
 =item unmounted_filesystems()
 
+Returns a list of all filesystems which cannot be verified as currently
+being mounted.
+
 =item special_filesystems()
 
-=back
+Returns a list of all fileystems which are considered special. This will
+usually contain meta and swap partitions like /proc and /dev/shm on Linux.
 
 =back
+
+=head2 Filesystem Properties
+
+Available filesystem properties and their names vary wildly between platforms.
+Common aliases have been provided wherever possible. You should check the
+documentation of the specific platform helper module to list all of the
+properties which are available for that platform. For example, read the
+Sys::Filesystem::Linux documentation for a list of all filesystem properties
+available to query under Linux.
+
+=over 4
+
+=item mount_point() or filesystem()
+
+Returns the friendly name of the filesystem. This will usually be the same
+name as appears in the list returned by the filesystems() method.
+
+=item device()
+
+Returns the physical device that the filesystem is connected to.
+
+=item type() or format()
+
+Returns the type of filesystem format. fat32, ntfs, ufs, hpfs, ext3, xfs etc.
+
+=item options()
+
+Returns the options that the filesystem was mounted with. This may commonly
+contain information such as read-write, user and group settings and
+permissions.
+
+=item mount_order()
+
+Returns the order in which this filesystem should be mounted on boot.
+
+=item check_order()
+
+Returns the order in which this filesystem should be consistancy checked
+on boot.
+
+=item check_frequency()
+
+Returns how often this filesystem is checked for consistancy.
+
+=back
+
+=head1 OS SPECIFIC HELPER MODULES
+
+=head2 Dummy
+
+The Dummy module is there to provide a default failover result to the main
+Sys::Filesystem module if no suitable platform specific module can be found
+or sucessfully loaded. This is the last module to be tried, in order of
+platform, Unix (if not on Win32), and then Dummy.
+
+Maintained by Nicola Worthington.
+
+=head2 Unix
+
+The Unix module is intended to provide a "best guess" failover result to the
+main Sys::Filesystem module if no suitable platform specific module can be
+found, and the platform is not 'Win32'.
+
+=head2 Linux
+
+Maintained by Nicola Worthington.
+
+=head2 Solaris
+
+Initial revision written by Nicola Worthington.
+
+=head2 Win32
+
+Initial revision written by Nicola Worthington.
+
+=head2 OS Identifiers
+
+The following list is taken from perlport(1). Please refer to the original
+source for the most up to date version. This information should help anyone
+who wishes to write a helper module for a new platform. Modules should have
+the same name as ^O in title caps. Thus 'openbsd' becomes 'Openbsd.pm'.
+
+    uname         $^O        $Config{archname}
+    ------------------------------------------
+    AIXaix        aix
+    BSD/OS        bsdos      i386-bsdos
+    Darwin        darwin     darwin
+    dgux          dgux       AViiON-dgux
+    DYNIX/ptx     dynixptx   i386-dynixptx
+    FreeBSD       freebsd    freebsd-i386
+    Linux         linux      arm-linux
+    Linux         linux      i386-linux
+    Linux         linux      i586-linux
+    Linux         linux      ppc-linux
+    HP-UX         hpux       PA-RISC1.1
+    IRIX          irix       irix
+    Mac OS X      darwin     darwin
+    MachTen PPC   machten    powerpc-machten
+    NeXT 3        next       next-fat
+    NeXT 4        next       OPENSTEP-Mach
+    openbsd       openbsd    i386-openbsd
+    OSF1          dec_osf    alpha-dec_osf
+    reliantunix-n svr4       RM400-svr4
+    SCO_SV        sco_sv     i386-sco_sv
+    SINIX-N       svr4       RM400-svr4
+    sn4609        unicos     CRAY_C90-unicos
+    sn6521        unicosmk   t3e-unicosmk
+    sn9617        unicos     CRAY_J90-unicos
+    SunOS         solaris    sun4-solaris
+    SunOS         solaris    i86pc-solaris
+    SunOS4        sunos      sun4-sunos
+    OS/390        os390      os390
+    OS400         os400      os400
+    POSIX-BC      posix-bc   BS2000-posix-bc
+    VM/ESA        vmesa      vmesa
+    
+    OS            $^O        $Config{archname} ID    Version
+    --------------------------------------------------------
+    MS-DOS        dos        ?
+    PC-DOS        dos        ?
+    OS/2          os2        ?
+    Windows 3.1   ?          ?      0      3 01
+    Windows 95    MSWin32    MSWin32-x86       1      4 00
+    Windows 98    MSWin32    MSWin32-x86       1      4 10
+    Windows ME    MSWin32    MSWin32-x86       1      ?
+    Windows NT    MSWin32    MSWin32-x86       2      4 xx
+    Windows NT    MSWin32    MSWin32-ALPHA     2      4 xx
+    Windows NT    MSWin32    MSWin32-ppc       2      4 xx
+    Windows 2000  MSWin32    MSWin32-x86       2      5 xx
+    Windows XP    MSWin32    MSWin32-x86       2      ?
+    Windows CE    MSWin32    ?      3
+    Cygwin        cygwin     ?
+    
+    OS            $^O        $Config{archname}
+    ------------------------------------------
+    Amiga DOS     amigaos    m68k-amigos
+    BeOS          beos
+    MPE/iX        mpeix      PA-RISC1.1
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -212,7 +447,7 @@ http://www.unixguide.net/unixguide.shtml
 
 =head1 SEE ALSO
 
-Solaris::DeviceTree Win32::DriveInfo
+perlport(1) Solaris::DeviceTree Win32::DriveInfo
 
 =head1 TODO
 
@@ -220,11 +455,13 @@ Add support for Windows, AIX, FreeBSD, HP-UX, Linux, Solaris and Tru64.
 
 =head1 BUGS
 
-Probably
+Probably. Please email me a patch if you find something ghastly.
 
 =head1 AUTHOR
 
 Nicola Worthington <nicolaworthington@msn.com>
+
+http://www.nicolaworthington.com/
 
 $Author: nicolaw $
 
@@ -245,6 +482,12 @@ __END__
 # CVS changelog
 
 $Log: Filesystem.pm,v $
+Revision 1.6  2004/09/29 12:01:23  nicolaw
+Added aliases and condition of Unix module not if Win32
+
+Revision 1.5  2004/09/29 10:43:12  nicolaw
+Added POD
+
 Revision 1.4  2004/09/28 16:35:31  nicolaw
 *** empty log message ***
 
