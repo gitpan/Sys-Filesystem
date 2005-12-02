@@ -14,7 +14,7 @@ use Carp qw(croak);
 # Globals and constants
 
 use vars qw($VERSION);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.10 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.11 $ =~ /(\d+)/g);
 
 
 
@@ -22,10 +22,10 @@ $VERSION = sprintf('%d.%02d', q$Revision: 1.10 $ =~ /(\d+)/g);
 # Public methods
 
 sub new {
-        # Check we're being called correctly with a class name
-        ref(my $class = shift) && croak 'Class name required';
-        my %args = @_;
-        my $self = { };
+	# Check we're being called correctly with a class name
+	ref(my $class = shift) && croak 'Class name required';
+	my %args = @_;
+	my $self = { };
 
 	# Defaults
 	$args{fstab} ||= '/etc/fstab';
@@ -40,6 +40,7 @@ sub new {
 	if ($fstab->open($args{fstab})) {
 		while (<$fstab>) {
 			next if /^\s*#/;
+			next if /^\s*$/;
 			my @vals = split(/\s+/, $_);
 			$self->{$vals[1]}->{mount_point} = $vals[1];
 			$self->{$vals[1]}->{device} = $vals[0];
@@ -59,6 +60,7 @@ sub new {
 	if ($mtab->open($args{mtab})) {
 		while (<$mtab>) {
 			next if /^\s*\#/;
+			next if /^\s*$/;
 			my @vals = split(/\s+/, $_);
 			delete $self->{$vals[1]}->{unmounted} if exists $self->{$vals[1]}->{unmounted};
 			$self->{$vals[1]}->{mounted} = 1;
@@ -74,9 +76,9 @@ sub new {
 		croak "Unable to open mtab file ($args{mtab})\n";
 	}
 
-        # Bless and return
-        bless($self,$class);
-        return $self;
+	# Bless and return
+	bless($self,$class);
+	return $self;
 }
 
 1;
@@ -95,7 +97,7 @@ Sys::Filesystem::Linux - Return Linux filesystem information to Sys::Filesystem
 
 =head1 VERSION
 
-$Revision: 1.10 $
+$Revision: 1.11 $
 
 =head1 FILESYSTEM PROPERTIES
 
@@ -195,6 +197,9 @@ $Author: nicolaw $
 =head1 CHANGELOG
 
     $Log: Linux.pm,v $
+    Revision 1.11  2005/12/02 16:05:04  nicolaw
+    Fixed tabulation, ^M's and skipping of empty lines in footab files
+
     Revision 1.10  2004/12/01 11:16:38  nicolaw
     *** empty log message ***
 

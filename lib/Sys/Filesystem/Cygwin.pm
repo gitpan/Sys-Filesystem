@@ -14,7 +14,7 @@ use Carp qw(croak);
 # Globals and constants
 
 use vars qw($VERSION);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.4 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.5 $ =~ /(\d+)/g);
 
 
 
@@ -22,35 +22,36 @@ $VERSION = sprintf('%d.%02d', q$Revision: 1.4 $ =~ /(\d+)/g);
 # Public methods
 
 sub new {
-        # Check we're being called correctly with a class name
-        ref(my $class = shift) && croak 'Class name required';
-        my %args = @_;
-        my $self = { };
+	# Check we're being called correctly with a class name
+	ref(my $class = shift) && croak 'Class name required';
+	my %args = @_;
+	my $self = { };
 
-        # Default mtab and mtab layout
-        my @keys = qw(fs_spec fs_file fs_vfstype fs_mntops);
+	# Default mtab and mtab layout
+	my @keys = qw(fs_spec fs_file fs_vfstype fs_mntops);
 
-        # Read the mtab
-        my $mtab = new FileHandle;
-        if ($mtab->open('mount|')) {
-                while (<$mtab>) {
-                        next if /^\s*#/;
+	# Read the mtab
+	my $mtab = new FileHandle;
+	if ($mtab->open('mount|')) {
+		while (<$mtab>) {
+			next if /^\s*#/;
+			next if /^\s*$/;
 			if (my @vals = $_ =~ /^\s*(.+?) on (\/.+?) type (\S+) \((\S+)\)\s*$/) {
-	                        $self->{$vals[1]}->{mounted} = 1;
-	                        $self->{$vals[1]}->{special} = 1 if grep(/^$vals[2]$/,qw(swap proc devpts tmpfs));
-	                        for (my $i = 0; $i < @keys; $i++) {
-	                                $self->{$vals[1]}->{$keys[$i]} = $vals[$i];
-	                        }
+				$self->{$vals[1]}->{mounted} = 1;
+				$self->{$vals[1]}->{special} = 1 if grep(/^$vals[2]$/,qw(swap proc devpts tmpfs));
+				for (my $i = 0; $i < @keys; $i++) {
+					$self->{$vals[1]}->{$keys[$i]} = $vals[$i];
+				}
 			}
-                }
-                $mtab->close;
-        } else {
-                croak "Unable to open pipe handle for mount command\n";
-        }
+		}
+		$mtab->close;
+	} else {
+		croak "Unable to open pipe handle for mount command\n";
+	}
 
-        # Bless and return
-        bless($self,$class);
-        return $self;
+	# Bless and return
+	bless($self,$class);
+	return $self;
 }
 
 1;
@@ -84,7 +85,7 @@ Sys::Filesystem::Cygwin - Return Cygwin filesystem information to Sys::Filesyste
 
 =head1 VERSION
 
-$Revision: 1.4 $
+$Revision: 1.5 $
 
 =head1 FILESYSTEM PROPERTIES
 
@@ -131,6 +132,9 @@ $Author: nicolaw $
 =head1 CHANGELOG
 
     $Log: Cygwin.pm,v $
+    Revision 1.5  2005/12/02 16:05:03  nicolaw
+    Fixed tabulation, ^M's and skipping of empty lines in footab files
+
     Revision 1.4  2004/10/06 16:14:27  nicolaw
     Fixed some typos
 

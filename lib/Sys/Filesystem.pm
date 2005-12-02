@@ -16,7 +16,7 @@ use Carp qw(croak cluck confess);
 
 use constant DEBUG => $ENV{DEBUG} ? 1 : 0;
 use vars qw($VERSION $AUTOLOAD);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.14 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.15 $ =~ /(\d+)/g);
 
 
 
@@ -75,8 +75,8 @@ sub new {
 			Package => __PACKAGE__,
 			Version => $VERSION,
 			Author => '$Author: nicolaw $',
-			Revision => '$Revision: 1.14 $',
-			Id => '$Id: Filesystem.pm,v 1.14 2005/01/30 18:10:41 nicolaw Exp $',
+			Revision => '$Revision: 1.15 $',
+			Id => '$Id: Filesystem.pm,v 1.15 2005/12/02 16:06:51 nicolaw Exp $',
 		};
 
 	# Debug
@@ -224,7 +224,7 @@ Sys::Filesystem - Retrieve list of filesystems and their properties
 
 =head1 VERSION
 
-$Revision: 1.14 $
+$Revision: 1.15 $
 
 =head1 SYNOPSIS
 
@@ -566,7 +566,7 @@ Probably. Please email me a patch if you find something ghastly.
 
 =head1 AUTHOR
 
-Nicola Worthington <nicolaworthington@msn.com>
+Nicola Worthington <nicolaw@cpan.org>
 
 http://www.nicolaworthington.com/
 
@@ -593,6 +593,9 @@ __END__
 # CVS changelog
 
 $Log: Filesystem.pm,v $
+Revision 1.15  2005/12/02 16:06:51  nicolaw
+Updated for revision number and email address
+
 Revision 1.14  2005/01/30 18:10:41  nicolaw
 Added some new filesystem property aliases and reference to AIX helper module
 

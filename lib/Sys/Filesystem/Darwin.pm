@@ -50,7 +50,7 @@ The filesystem information is taken from diskutil, the system utility supplied o
 
 =head1 VERSION
 
-$Revision: 1.1 $
+$Revision: 1.2 $
 
 =head1 FILESYSTEM PROPERTIES
 
@@ -120,6 +120,9 @@ Christian Renz <crenz@web42.com>
 =head1 CHANGES
 
 $Log: Darwin.pm,v $
+Revision 1.2  2005/12/02 16:05:04  nicolaw
+Fixed tabulation, ^M's and skipping of empty lines in footab files
+
 Revision 1.1  2005/01/13 23:37:28  nicolaw
 Initial revision.
 
