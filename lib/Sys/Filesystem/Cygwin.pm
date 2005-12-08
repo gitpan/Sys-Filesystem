@@ -14,7 +14,7 @@ use Carp qw(croak);
 # Globals and constants
 
 use vars qw($VERSION);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.5 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.6 $ =~ /(\d+)/g);
 
 
 
@@ -83,14 +83,14 @@ sub new {
 
 Sys::Filesystem::Cygwin - Return Cygwin filesystem information to Sys::Filesystem
 
-=head1 VERSION
+=head1 SYNOPSIS
 
-$Revision: 1.5 $
+See L<Sys::Filesystem>.
 
-=head1 FILESYSTEM PROPERTIES
+=head1 METHODS
 
 The following is a list of filesystem properties which may
-be queried as methods through the parent Sys::Filesystem object.
+be queried as methods through the parent L<Sys::Filesystem> object.
 
 =over 4
 
@@ -114,34 +114,25 @@ Mount options.
 
 =head1 SEE ALSO
 
-Sys::Filesystem Sys::Filesystem::Unix http://cygwin.com/cygwin-ug-net/using.html
+L<http://cygwin.com/cygwin-ug-net/using.html>
 
-=head1 BUGS
+=head1 VERSION
 
-Probably. Please email me a patch if you find something ghastly.
+$Id: Cygwin.pm,v 1.6 2005/12/08 15:44:12 nicolaw Exp $
 
 =head1 AUTHOR
 
+Nicola Worthington <nicolaw@cpan.org>
 
-Nicola Worthington <nicolaworthington@msn.com>
+http://perlgirl.org.uk
 
-http://www.nicolaworthington.com/
+=head1 COPYRIGHT
 
-$Author: nicolaw $
+(c) Nicola Worthington 2004, 2005. This program is free software; you can
+redistribute it and/or modify it under the GNU GPL.
 
-=head1 CHANGELOG
+See the file COPYING in this distribution, or
+http://www.gnu.org/licenses/gpl.txt 
 
-    $Log: Cygwin.pm,v $
-    Revision 1.5  2005/12/02 16:05:03  nicolaw
-    Fixed tabulation, ^M's and skipping of empty lines in footab files
-
-    Revision 1.4  2004/10/06 16:14:27  nicolaw
-    Fixed some typos
-
-    Revision 1.3  2004/10/06 16:03:53  nicolaw
-    Updated around mount command pipe
-
-    Revision 1.2  2004/10/06 15:42:13  nicolaw
-    Added dummy skel to finish up on shortly
-
+=cut
 

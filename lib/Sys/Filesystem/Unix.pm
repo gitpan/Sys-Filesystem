@@ -14,7 +14,7 @@ use Carp qw(croak);
 # Globals and constants
 
 use vars qw($VERSION);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.3 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.4 $ =~ /(\d+)/g);
 
 
 
@@ -81,22 +81,34 @@ sub new {
 
 
 
-__END__
+=pod
 
-###############################################################################
-# CVS changelog
+=head1 NAME
 
-$Log: Unix.pm,v $
-Revision 1.3  2005/12/02 16:05:04  nicolaw
-Fixed tabulation, ^M's and skipping of empty lines in footab files
+Sys::Filesystem::Unix - Return generic Unix filesystem information to Sys::Filesystem
 
-Revision 1.2  2004/09/28 16:43:21  nicolaw
-*** empty log message ***
+=head1 SYNOPSIS
 
-Revision 1.4  2004/09/28 16:35:32  nicolaw
-*** empty log message ***
+See L<Sys::Filesystem>.
 
-Revision 1.3  2004/09/28 16:25:34  nicolaw
-*** empty log message ***
+=head1 VERSION
+
+$Id: Unix.pm,v 1.4 2005/12/08 15:44:12 nicolaw Exp $
+
+=head1 AUTHOR
+
+Nicola Worthington <nicolaw@cpan.org>
+
+http://perlgirl.org.uk
+
+=head1 COPYRIGHT
+
+(c) Nicola Worthington 2004, 2005. This program is free software; you can
+redistribute it and/or modify it under the GNU GPL.
+
+See the file COPYING in this distribution, or
+http://www.gnu.org/licenses/gpl.txt 
+
+=cut
 
 

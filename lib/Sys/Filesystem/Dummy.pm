@@ -14,7 +14,7 @@ use Carp qw(croak);
 # Globals and constants
 
 use vars qw($VERSION);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.4 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.5 $ =~ /(\d+)/g);
 
 
 
@@ -45,36 +45,28 @@ sub new {
 
 Sys::Filesystem::Dummy - Returns nothing to Sys::Filesystem
 
+=head1 SYNOPSIS
+
+See L<Sys::Filesystem>.
+
 =head1 VERSION
 
-$Revision: 1.4 $
-
-=head1 SEE ALSO
-
-Sys::Filesystem Sys::Filesystem::Unix Sys::Filesystem::Win32
-
-=head1 BUGS
-
-Probably. Please email me a patch if you find something ghastly.
+$Id: Dummy.pm,v 1.5 2005/12/08 15:44:12 nicolaw Exp $
 
 =head1 AUTHOR
 
-Nicola Worthington <nicolaworthington@msn.com>
+Nicola Worthington <nicolaw@cpan.org.uk>
 
-http://www.nicolaworthington.com/
+http://perlgirl.org.uk
 
-$Author: nicolaw $
+=head1 COPYRIGHT
 
-=head1 CHANGELOG
+(c) Nicola Worthington 2004, 2005. This program is free software; you can
+redistribute it and/or modify it under the GNU GPL.
 
-    $Log: Dummy.pm,v $
-    Revision 1.4  2004/10/06 15:44:12  nicolaw
-    Added POD
+See the file COPYING in this distribution, or
+http://www.gnu.org/licenses/gpl.txt 
 
-    Revision 1.3  2004/09/28 16:43:21  nicolaw
-    *** empty log message ***
-    
-    Revision 1.2  2004/09/28 16:42:40  nicolaw
-    *** empty log message ***
+=cut
 
 

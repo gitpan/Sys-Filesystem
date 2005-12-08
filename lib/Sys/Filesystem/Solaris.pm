@@ -14,7 +14,7 @@ use Carp qw(croak);
 # Globals and constants
 
 use vars qw($VERSION);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.11 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.12 $ =~ /(\d+)/g);
 
 
 
@@ -93,14 +93,14 @@ sub new {
 
 Sys::Filesystem::Solaris - Return Solaris filesystem information to Sys::Filesystem
 
-=head1 VERSION
+=head1 SYNOPSIS
 
-$Revision: 1.11 $
+See L<Sys::Filesystem>.
 
-=head1 FILESYSTEM PROPERTIES
+=head1 METHODS
 
 The following is a list of filesystem properties which may
-be queried as methods through the parent Sys::Filesystem object.
+be queried as methods through the parent L<Sys::Filesystem> object.
 
 =over 4
 
@@ -141,53 +141,25 @@ The time at which the file system was mounted.
 
 =head1 SEE ALSO
 
-Solaris::DeviceTree
+L<Solaris::DeviceTree>
 
-=head1 BUGS
+=head1 VERSION
 
-Probably. Please email me a patch if you find something ghastly.
+$Id: Solaris.pm,v 1.12 2005/12/08 15:44:12 nicolaw Exp $
 
 =head1 AUTHOR
 
 Nicola Worthington <nicolaworthington@msn.com>
 
-http://www.nicolaworthington.com/
+http://perlgirl.org.uk
 
-$Author: nicolaw $
+=head1 COPYRIGHT
 
-=head1 CHANGELOG
+(c) Nicola Worthington 2004, 2005. This program is free software; you can
+redistribute it and/or modify it under the GNU GPL.
 
-    $Log: Solaris.pm,v $
-    Revision 1.11  2005/12/02 16:05:04  nicolaw
-    Fixed tabulation, ^M's and skipping of empty lines in footab files
+See the file COPYING in this distribution, or
+http://www.gnu.org/licenses/gpl.txt 
 
-    Revision 1.10  2004/10/06 15:27:37  nicolaw
-    Type in POD
-
-    Revision 1.9  2004/10/06 15:24:29  nicolaw
-    Added some POD to document filesystem property access methods
-
-    Revision 1.8  2004/09/30 14:13:04  nicolaw
-    Copied special fs logic to the mnttab loop also
-    
-    Revision 1.7  2004/09/30 14:02:15  nicolaw
-    Added mntfs and autofs as special filesystems
-    
-    Revision 1.6  2004/09/30 13:25:07  nicolaw
-    Added mnttab support (see man mnttab)
-    
-    Revision 1.5  2004/09/28 17:01:17  nicolaw
-    *** empty log message ***
-    
-    Revision 1.4  2004/09/28 16:58:51  nicolaw
-    *** empty log message ***
-    
-    Revision 1.3  2004/09/28 16:55:19  nicolaw
-    *** empty log message ***
-    
-    Revision 1.2  2004/09/28 16:52:30  nicolaw
-    *** empty log message ***
-    
-    Revision 1.1  2004/09/28 16:47:11  nicolaw
-    *** empty log message ***
+=cut
 

@@ -16,7 +16,7 @@ use Carp qw(croak cluck confess);
 
 use constant DEBUG => $ENV{DEBUG} ? 1 : 0;
 use vars qw($VERSION $AUTOLOAD);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.15 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.16 $ =~ /(\d+)/g);
 
 
 
@@ -75,8 +75,8 @@ sub new {
 			Package => __PACKAGE__,
 			Version => $VERSION,
 			Author => '$Author: nicolaw $',
-			Revision => '$Revision: 1.15 $',
-			Id => '$Id: Filesystem.pm,v 1.15 2005/12/02 16:06:51 nicolaw Exp $',
+			Revision => '$Revision: 1.16 $',
+			Id => '$Id: Filesystem.pm,v 1.16 2005/12/08 15:44:11 nicolaw Exp $',
 		};
 
 	# Debug
@@ -221,10 +221,6 @@ sub DUMP {
 =head1 NAME
 
 Sys::Filesystem - Retrieve list of filesystems and their properties
-
-=head1 VERSION
-
-$Revision: 1.15 $
 
 =head1 SYNOPSIS
 
@@ -478,103 +474,49 @@ This isn't written yet. It's on the top of the (very slow) TODO list.
 
 =head2 OS Identifiers
 
-The following list is taken from perlport(1). Please refer to the original
+The following list is taken from L<perlport>. Please refer to the original
 source for the most up to date version. This information should help anyone
 who wishes to write a helper module for a new platform. Modules should have
 the same name as ^O in title caps. Thus 'openbsd' becomes 'Openbsd.pm'.
 
-    uname         $^O        $Config{archname}
-    ------------------------------------------
-    AIXaix        aix
-    BSD/OS        bsdos      i386-bsdos
-    Darwin        darwin     darwin
-    dgux          dgux       AViiON-dgux
-    DYNIX/ptx     dynixptx   i386-dynixptx
-    FreeBSD       freebsd    freebsd-i386
-    Linux         linux      arm-linux
-    Linux         linux      i386-linux
-    Linux         linux      i586-linux
-    Linux         linux      ppc-linux
-    HP-UX         hpux       PA-RISC1.1
-    IRIX          irix       irix
-    Mac OS X      darwin     darwin
-    MachTen PPC   machten    powerpc-machten
-    NeXT 3        next       next-fat
-    NeXT 4        next       OPENSTEP-Mach
-    openbsd       openbsd    i386-openbsd
-    OSF1          dec_osf    alpha-dec_osf
-    reliantunix-n svr4       RM400-svr4
-    SCO_SV        sco_sv     i386-sco_sv
-    SINIX-N       svr4       RM400-svr4
-    sn4609        unicos     CRAY_C90-unicos
-    sn6521        unicosmk   t3e-unicosmk
-    sn9617        unicos     CRAY_J90-unicos
-    SunOS         solaris    sun4-solaris
-    SunOS         solaris    i86pc-solaris
-    SunOS4        sunos      sun4-sunos
-    OS/390        os390      os390
-    OS400         os400      os400
-    POSIX-BC      posix-bc   BS2000-posix-bc
-    VM/ESA        vmesa      vmesa
-    
-    OS            $^O        $Config{archname} ID    Version
-    --------------------------------------------------------
-    MS-DOS        dos        ?
-    PC-DOS        dos        ?
-    OS/2          os2        ?
-    Windows 3.1   ?          ?                 0      3 01
-    Windows 95    MSWin32    MSWin32-x86       1      4 00
-    Windows 98    MSWin32    MSWin32-x86       1      4 10
-    Windows ME    MSWin32    MSWin32-x86       1      ?
-    Windows NT    MSWin32    MSWin32-x86       2      4 xx
-    Windows NT    MSWin32    MSWin32-ALPHA     2      4 xx
-    Windows NT    MSWin32    MSWin32-ppc       2      4 xx
-    Windows 2000  MSWin32    MSWin32-x86       2      5 xx
-    Windows XP    MSWin32    MSWin32-x86       2      ?
-    Windows CE    MSWin32    ?                 3
-    Cygwin        cygwin     ?
-    
-    OS            $^O        $Config{archname}
-    ------------------------------------------
-    Amiga DOS     amigaos    m68k-amigos
-    BeOS          beos
-    MPE/iX        mpeix      PA-RISC1.1
+=head1 TODO
 
-=head1 ACKNOWLEDGEMENTS
-
-Christian Renz <crenz@web42.com> is the maintainer of Sys::Filesystem::Darwin.
-
-Brad Greenlee <brad@footle.org> for suggesting and patching for the
-filesystem(device => "string") method functionality.
-
-http://publib.boulder.ibm.com/infocenter/pseries/index.jsp?topic=/com.ibm.aix.doc/files/aixfiles/filesystems.htm
-
-http://www.unixguide.net/unixguide.shtml
+Add support for Windows, FreeBSD, HP-UX and Tru64. Please contact me
+if you would like to provide code for these operating systems.
 
 =head1 SEE ALSO
 
-perlport(1) Solaris::DeviceTree Win32::DriveInfo
+L<perlport>, L<Solaris::DeviceTree>, L<Win32::DriveInfo>
 
-=head1 TODO
+=head1 VERSION
 
-Add support for Windows, AIX, FreeBSD, HP-UX and Tru64. Please contact me
-if you would like to provide code for these operating systems.
-
-=head1 BUGS
-
-Probably. Please email me a patch if you find something ghastly.
+$Id: Filesystem.pm,v 1.16 2005/12/08 15:44:11 nicolaw Exp $
 
 =head1 AUTHOR
 
 Nicola Worthington <nicolaw@cpan.org>
 
-http://www.nicolaworthington.com/
+http://perlgirl.org.uk
 
-http://search.cpan.org/~NICOLAW/
+=head1 ACKNOWLEDGEMENTS
 
-http://freshmeat.net/users/nicolaw/
+Christian Renz <crenz@web42.com> is the maintainer
+of L<Sys::Filesystem::Darwin>.
 
-$Author: nicolaw $
+Brad Greenlee <brad@footle.org> for suggesting and patching for the
+filesystem(device => "string") method functionality.
+
+L<http://publib.boulder.ibm.com/infocenter/pseries/index.jsp?topic=/com.ibm.aix.doc/files/aixfiles/filesystems.htm>
+
+L<http://www.unixguide.net/unixguide.shtml>
+
+=head1 COPYRIGHT
+
+(c) Nicola Worthington 2005. This program is free software; you can
+redistribute it and/or modify it under the GNU GPL.
+
+See the file COPYING in this distribution, or
+http://www.gnu.org/licenses/gpl.txt 
 
 =cut
 
@@ -593,6 +535,9 @@ __END__
 # CVS changelog
 
 $Log: Filesystem.pm,v $
+Revision 1.16  2005/12/08 15:44:11  nicolaw
+Modified POD
+
 Revision 1.15  2005/12/02 16:06:51  nicolaw
 Updated for revision number and email address
 

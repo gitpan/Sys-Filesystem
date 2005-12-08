@@ -44,20 +44,22 @@ sub new {
 
 Sys::Filesystem::Darwin - Return Darwin (Mac OS X) filesystem information to Sys::Filesystem
 
+=head1 SYNOPSIS
+
+See L<Sys::Filesystem>.
+
 =head1 DESCRIPTION
 
-The filesystem information is taken from diskutil, the system utility supplied on Mac OS X.
+The filesystem information is taken from diskutil, the system utility
+supplied on Mac OS X.
 
-=head1 VERSION
-
-$Revision: 1.2 $
-
-=head1 FILESYSTEM PROPERTIES
+=head1 METHODS
 
 The following is a list of filesystem properties which may
-be queried as methods through the parent Sys::Filesystem object.
+be queried as methods through the parent L<Sys::Filesystem> object.
 
-The property 'label' is also set, but cannot be queried by Sys::Filesystem yet.
+The property 'label' is also set, but cannot be queried by L<Sys::Filesystem>
+yet.
 
 =over 4
 
@@ -104,26 +106,32 @@ For mounted FTP servers, disktool returns an empty filesystem type (ie, '').
 
 =back
 
-=head1 SEE ALSO
-
-Sys::Filesystem diskutil
-
 =head1 BUGS
 
 Doesn't take /etc/fstab or /etc/xtab into account right now, since they are 
 normally not used. Contact me if you need this.
 
+=head1 SEE ALSO
+
+L<Sys::Filesystem>, L<diskutil>
+
+=head1 VERSION
+
+$Id: Darwin.pm,v 1.3 2005/12/08 15:44:12 nicolaw Exp $
+
 =head1 AUTHOR
 
 Christian Renz <crenz@web42.com>
 
-=head1 CHANGES
+=head1 COPYRIGHT
 
-$Log: Darwin.pm,v $
-Revision 1.2  2005/12/02 16:05:04  nicolaw
-Fixed tabulation, ^M's and skipping of empty lines in footab files
+(c) Christian Renz 2004, 2005. This program is free software; you can redistribute
+it and/or modify it under the GNU GPL.
 
-Revision 1.1  2005/01/13 23:37:28  nicolaw
-Initial revision.
+See the file COPYING in this distribution, or
+http://www.gnu.org/licenses/gpl.txt 
+
+=cut
+
 
 

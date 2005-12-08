@@ -14,7 +14,7 @@ use Carp qw(croak);
 # Globals and constants
 
 use vars qw($VERSION);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.1 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.2 $ =~ /(\d+)/g);
 
 
 
@@ -78,14 +78,14 @@ sub new {
 
 Sys::Filesystem::AIX - Return AIX filesystem information to Sys::Filesystem
 
-=head1 VERSION
+=head1 SYNOPSIS
 
-$Revision: 1.1 $
+See L<Sys::Filesystem>.
 
-=head1 FILESYSTEM PROPERTIES
+=head1 METHODS
 
 The following is a list of filesystem properties which may
-be queried as methods through the parent Sys::Filesystem object.
+be queried as methods through the parent L<Sys::Filesystem> object.
 
 =over 4
 
@@ -152,39 +152,28 @@ system is modified. This is only valid for journaled filesystems.
 
 =back
 
-=head1 ACKNOWLEDGEMENTS
-
-http://publib.boulder.ibm.com/infocenter/pseries/index.jsp?topic=/com.ibm.aix.doc/files/aixfiles/filesystems.htm
-
 =head1 SEE ALSO
 
-Sys::Filesystem
+L<Sys::Filesystem>
 
-=head1 BUGS
+=head1 VERSION
 
-Probably. Please email me a patch if you find something ghastly.
+$Id: AIX.pm,v 1.2 2005/12/08 15:44:12 nicolaw Exp $
 
 =head1 AUTHOR
 
-Nicola Worthington <nicolaworthington@msn.com>
+Nicola Worthington <nicolaw@cpan.org>
 
-http://www.nicolaworthington.com/
+perlgirl.org.uk
 
-$Author: nicolaw $
+=head1 COPYRIGHT
 
-=head1 CHANGELOG
+(c) Nicola Worthington 204, 2005. This program is free software; you can
+redistribute it and/or modify it under the GNU GPL.
 
-    $Log: AIX.pm,v $
-    Revision 1.1  2005/01/30 18:10:49  nicolaw
-    Added first revision
+See the file COPYING in this distribution, or
+http://www.gnu.org/licenses/gpl.txt 
 
-
-
-
-
-
-
-
-
+=cut
 
 

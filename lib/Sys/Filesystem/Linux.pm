@@ -14,7 +14,7 @@ use Carp qw(croak);
 # Globals and constants
 
 use vars qw($VERSION);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.11 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.12 $ =~ /(\d+)/g);
 
 
 
@@ -95,14 +95,14 @@ sub new {
 
 Sys::Filesystem::Linux - Return Linux filesystem information to Sys::Filesystem
 
-=head1 VERSION
+=head1 SYNOPSIS
 
-$Revision: 1.11 $
+See L<Sys::Filesystem>.
 
-=head1 FILESYSTEM PROPERTIES
+=head1 METHODS
 
 The following is a list of filesystem properties which may
-be queried as methods through the parent Sys::Filesystem object.
+be queried as methods through the parent L<Sys::Filesystem> object.
 
 =over 4
 
@@ -111,13 +111,13 @@ be queried as methods through the parent Sys::Filesystem object.
 Dscribes the block special device or remote filesystem to be mounted.
 
 For  ordinary  mounts  it  will hold (a link to) a block special device
-node (as created by mknod(8))  for  the  device  to  be  mounted,  like
+node (as created by L<mknod(8)>)  for  the  device  to  be  mounted,  like
 /dev/cdrom’   or   ‘/dev/sdb7’.    For   NFS   mounts  one  will  have
 <host>:<dir>, e.g., ‘knuth.aeb.nl:/’.  For procfs, use ‘proc’.
 
 Instead of giving the device explicitly, one may indicate the (ext2  or
 xfs)  filesystem that is to be mounted by its UUID or volume label (cf.
-e2label(8) or  xfs_admin(8)),  writing  LABEL=<label>  or  UUID=<uuid>,
+L<e2label(8)> or  L<xfs_admin(8)>),  writing  LABEL=<label>  or  UUID=<uuid>,
 e.g.,   ‘LABEL=Boot’   or  ‘UUID=3e6be9de-8139-11d1-9106-a43f08d823a6’.
 This will make the system more robust: adding or removing a  SCSI  disk
 changes the disk device name but not the filesystem volume label.
@@ -136,9 +136,9 @@ Linux  supports  lots  of filesystem types, such as adfs, affs, autofs,
 coda, coherent, cramfs, devpts, efs, ext2, ext3,  hfs,  hpfs,  iso9660,
 jfs,  minix,  msdos,  ncpfs,  nfs,  ntfs,  proc, qnx4, reiserfs, romfs,
 smbfs, sysv, tmpfs, udf, ufs, umsdos, vfat, xenix,  xfs,  and  possibly
-others.  For more details, see mount(8).  For the filesystems currently
+others.  For more details, see L<mount(8)>.  For the filesystems currently
 supported by the running kernel, see /proc/filesystems.  An entry  swap
-denotes a file or partition to be used for swapping, cf. swapon(8).  An
+denotes a file or partition to be used for swapping, cf. L<swapon(8)>.  An
 entry ignore causes the line to be ignored.  This  is  useful  to  show
 disk partitions which are currently unused.
 
@@ -149,24 +149,24 @@ Describes the mount options associated with the filesystem.
 It is formatted as a comma separated list of options.  It  contains  at
 least  the type of mount plus any additional options appropriate to the
 filesystem type.  For documentation on the available options  for  non-
-nfs  file systems, see mount(8).  For documentation on all nfs-specific
-options have a look at nfs(5).  Common for all types of file system are
+nfs  file systems, see L<mount(8)>.  For documentation on all nfs-specific
+options have a look at L<nfs(5)>.  Common for all types of file system are
 the options ‘‘noauto’’ (do not mount when 'mount -a' is given, e.g., at
 boot time), ‘‘user’’ (allow a user  to  mount),  and  ‘‘owner’’  (allow
 device  owner to mount), and ‘‘_netdev’’ (device requires network to be
 available).  The ‘‘owner’’ and ‘‘_netdev’’ options are  Linux-specific.
-For more details, see mount(8).
+For more details, see L<mount(8)>.
 
 =item fs_freq
 
 Used  for  these filesystems by the
-dump(8) command to determine which filesystems need to be  dumped.   If
+L<dump(8)> command to determine which filesystems need to be  dumped.   If
 the  fifth  field  is not present, a value of zero is returned and dump
 will assume that the filesystem does not need to be dumped.
 
 =item fs_passno
 
-Used by the fsck(8) program to  determine the order in which filesystem
+Used by the L<fsck(8)> program to  determine the order in which filesystem
 checks are done at reboot time.  The
 root filesystem should be specified with a fs_passno of  1,  and  other
 filesystems  should  have a fs_passno of 2.  Filesystems within a drive
@@ -180,48 +180,26 @@ be checked.
 
 =head1 SEE ALSO
 
-Sys::Filesystem Sys::Filesystem::Unix fstab(5)
+L<Sys::Filesystem>, L<Sys::Filesystem::Unix>, L<fstab(5)>
 
-=head1 BUGS
+=head1 VERSION
 
-Probably. Please email me a patch if you find something ghastly.
+$Id: Linux.pm,v 1.12 2005/12/08 15:44:12 nicolaw Exp $
 
 =head1 AUTHOR
 
-Nicola Worthington <nicolaworthington@msn.com>
+Nicola Worthington <nicolaw@cpan.org>
 
-http://www.nicolaworthington.com/
+http://perlgirl.org.uk
 
-$Author: nicolaw $
+=head1 COPYRIGHT
 
-=head1 CHANGELOG
+(c) Nicola Worthington 2004, 2005. This program is free software; you can
+redistribute it and/or modify it under the GNU GPL.
 
-    $Log: Linux.pm,v $
-    Revision 1.11  2005/12/02 16:05:04  nicolaw
-    Fixed tabulation, ^M's and skipping of empty lines in footab files
+See the file COPYING in this distribution, or
+http://www.gnu.org/licenses/gpl.txt 
 
-    Revision 1.10  2004/12/01 11:16:38  nicolaw
-    *** empty log message ***
-
-    Revision 1.9  2004/10/06 15:34:58  nicolaw
-    *** empty log message ***
-
-    Revision 1.8  2004/10/06 15:33:49  nicolaw
-    Added POD to document accessor methods for filesystem properties
-
-    Revision 1.7  2004/10/05 14:23:38  nicolaw
-    tempfs (tmpfs) typo
-    
-    Revision 1.6  2004/10/05 14:12:49  nicolaw
-    Fixed detection of some special filesystem types
-    
-    Revision 1.5  2004/09/28 16:45:11  nicolaw
-    *** empty log message ***
-    
-    Revision 1.4  2004/09/28 16:35:32  nicolaw
-    *** empty log message ***
-    
-    Revision 1.3  2004/09/28 16:25:34  nicolaw
-    *** empty log message ***
+=cut
 
 

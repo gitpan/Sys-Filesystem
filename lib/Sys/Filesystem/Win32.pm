@@ -14,7 +14,7 @@ use Carp qw(croak);
 # Globals and constants
 
 use vars qw($VERSION);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.2 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.3 $ =~ /(\d+)/g);
 
 
 
@@ -36,16 +36,35 @@ sub new {
 
 
 
-__END__
 
-###############################################################################
-# CVS changelog
+=pod
 
-$Log: Win32.pm,v $
-Revision 1.2  2004/09/28 16:43:21  nicolaw
-*** empty log message ***
+=head1 NAME
 
-Revision 1.2  2004/09/28 16:42:40  nicolaw
-*** empty log message ***
+Sys::Filesystem::Win32 - Return Win32 filesystem information to Sys::Filesystem
+
+=head1 SYNOPSIS
+
+See L<Sys::Filesystem>.
+
+=head1 VERSION
+
+$Id: Win32.pm,v 1.3 2005/12/08 15:44:12 nicolaw Exp $
+
+=head1 AUTHOR
+
+Nicola Worthington <nicolaw@cpan.org>
+
+http://perlgirl.org.uk
+
+=head1 COPYRIGHT
+
+(c) Nicola Worthington 2004, 2005. This program is free software; you can
+redistribute it and/or modify it under the GNU GPL.
+
+See the file COPYING in this distribution, or
+http://www.gnu.org/licenses/gpl.txt 
+
+=cut
 
 
