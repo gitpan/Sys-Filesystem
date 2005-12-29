@@ -1,4 +1,27 @@
+############################################################
+# $Id: Filesystem.pm,v 1.18 2005/12/29 18:02:09 nicolaw Exp $
+# Sys::Filesystem - Retrieve list of filesystems and their properties
+# Copyright: (c)2004,2005 Nicola Worthington. All rights reserved.
+############################################################
+# This file is part of Sys::Filesystem.
+#
+# Sys::Filesystem is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Sys::Filesystem is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Sys::Filesystem; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+############################################################
+
 package Sys::Filesystem;
+# vim:ts=4:sw=4:tw=78
 
 ###############################################################################
 # Modules
@@ -16,7 +39,7 @@ use Carp qw(croak cluck confess);
 
 use constant DEBUG => $ENV{DEBUG} ? 1 : 0;
 use vars qw($VERSION $AUTOLOAD);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.16 $ =~ /(\d+)/g);
+$VERSION = sprintf('%d.%02d', q$Revision: 1.18 $ =~ /(\d+)/g);
 
 
 
@@ -75,8 +98,8 @@ sub new {
 			Package => __PACKAGE__,
 			Version => $VERSION,
 			Author => '$Author: nicolaw $',
-			Revision => '$Revision: 1.16 $',
-			Id => '$Id: Filesystem.pm,v 1.16 2005/12/08 15:44:11 nicolaw Exp $',
+			Revision => '$Revision: 1.18 $',
+			Id => '$Id: Filesystem.pm,v 1.18 2005/12/29 18:02:09 nicolaw Exp $',
 		};
 
 	# Debug
@@ -490,13 +513,13 @@ L<perlport>, L<Solaris::DeviceTree>, L<Win32::DriveInfo>
 
 =head1 VERSION
 
-$Id: Filesystem.pm,v 1.16 2005/12/08 15:44:11 nicolaw Exp $
+$Id: Filesystem.pm,v 1.18 2005/12/29 18:02:09 nicolaw Exp $
 
 =head1 AUTHOR
 
 Nicola Worthington <nicolaw@cpan.org>
 
-http://perlgirl.org.uk
+L<http://perlgirl.org.uk>
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -512,11 +535,11 @@ L<http://www.unixguide.net/unixguide.shtml>
 
 =head1 COPYRIGHT
 
-(c) Nicola Worthington 2005. This program is free software; you can
+(c) Nicola Worthington 2004,2005. This program is free software; you can
 redistribute it and/or modify it under the GNU GPL.
 
 See the file COPYING in this distribution, or
-http://www.gnu.org/licenses/gpl.txt 
+L<http://www.gnu.org/licenses/gpl.txt>
 
 =cut
 
@@ -528,13 +551,19 @@ http://www.gnu.org/licenses/gpl.txt
 __DATA__
 
 __END__
-
+ 
 
 
 ###############################################################################
 # CVS changelog
 
 $Log: Filesystem.pm,v $
+Revision 1.18  2005/12/29 18:02:09  nicolaw
+*** empty log message ***
+
+Revision 1.17  2005/12/08 17:30:29  nicolaw
+*** empty log message ***
+
 Revision 1.16  2005/12/08 15:44:11  nicolaw
 Modified POD
 

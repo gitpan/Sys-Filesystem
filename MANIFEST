@@ -6,6 +6,7 @@ lib/Sys/Filesystem/Unix.pm
 lib/Sys/Filesystem/Dummy.pm
 lib/Sys/Filesystem/Darwin.pm
 lib/Sys/Filesystem/Solaris.pm
+lib/Sys/Filesystem/Freebsd.pm
 lib/Sys/Filesystem/Cygwin.pm
 TODO
 README
