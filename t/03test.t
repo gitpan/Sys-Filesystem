@@ -7,8 +7,8 @@ use constant DEBUG => $ENV{DEBUG} ? 1 : 0;
 chdir 't' if -d 't';
 
 {
-	ok(my $fs = new Sys::Filesystem, 'Create new Sys::Filesystem object');
-
+	my $fs = new Sys::Filesystem;
+	ok(ref($fs) eq 'Sys::Filesystem', 'Create new Sys::Filesystem object');
 	ok(my @mounted_filesystems   = $fs->mounted_filesystems, 'Get list of mounted filesystems');
 	ok(my @unmounted_filesystems = $fs->unmounted_filesystems, 'Get list of unmounted filesystems');
 	ok(my @special_filesystems   = $fs->special_filesystems, 'Get list of special filesystems');

@@ -1,28 +1,35 @@
-package Sys::Filesystem::Linux;
+############################################################
+#
+#   $Id: Linux.pm 364 2006-03-23 15:22:19Z nicolaw $
+#   Sys::Filesystem - Retrieve list of filesystems and their properties
+#
+#   Copyright 2004,2005,2006 Nicola Worthington
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+############################################################
 
-###############################################################################
-# Modules
+package Sys::Filesystem::Linux;
+# vim:ts=4:sw=4:tw=78
 
 use strict;
-use warnings;
 use FileHandle;
 use Carp qw(croak);
 
-
-
-###############################################################################
-# Globals and constants
-
 use vars qw($VERSION);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.12 $ =~ /(\d+)/g);
-
-
-
-##############################################################################
-# Public methods
+$VERSION = '1.13' || sprintf('%d', q$Revision: 364 $ =~ /(\d+)/g);
 
 sub new {
-	# Check we're being called correctly with a class name
 	ref(my $class = shift) && croak 'Class name required';
 	my %args = @_;
 	my $self = { };
@@ -39,9 +46,11 @@ sub new {
 	my $fstab = new FileHandle;
 	if ($fstab->open($args{fstab})) {
 		while (<$fstab>) {
-			next if /^\s*#/;
-			next if /^\s*$/;
+			next if (/^\s*#/ || /^\s*$/);
 			my @vals = split(/\s+/, $_);
+			if ($vals[0] =~ /^\s*LABEL=(.+)\s*$/) {
+				$self->{$vals[1]}->{label} = $1;
+			}
 			$self->{$vals[1]}->{mount_point} = $vals[1];
 			$self->{$vals[1]}->{device} = $vals[0];
 			$self->{$vals[1]}->{unmounted} = 1;
@@ -82,12 +91,6 @@ sub new {
 }
 
 1;
-
-
-
-
-###############################################################################
-# POD
 
 =pod
 
@@ -184,21 +187,21 @@ L<Sys::Filesystem>, L<Sys::Filesystem::Unix>, L<fstab(5)>
 
 =head1 VERSION
 
-$Id: Linux.pm,v 1.12 2005/12/08 15:44:12 nicolaw Exp $
+$Id: Linux.pm 364 2006-03-23 15:22:19Z nicolaw $
 
 =head1 AUTHOR
 
 Nicola Worthington <nicolaw@cpan.org>
 
-http://perlgirl.org.uk
+L<http://perlgirl.org.uk>
 
 =head1 COPYRIGHT
 
-(c) Nicola Worthington 2004, 2005. This program is free software; you can
-redistribute it and/or modify it under the GNU GPL.
+Copyright 2004,2005,2006 Nicola Worthington.
 
-See the file COPYING in this distribution, or
-http://www.gnu.org/licenses/gpl.txt 
+This software is licensed under The Apache Software License, Version 2.0.
+
+L<http://www.apache.org/licenses/LICENSE-2.0>
 
 =cut
 

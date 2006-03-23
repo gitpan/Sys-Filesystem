@@ -1,21 +1,41 @@
+############################################################
+#
+#   $Id: Darwin.pm 364 2006-03-23 15:22:19Z nicolaw $
+#   Sys::Filesystem - Retrieve list of filesystems and their properties
+#
+#   Copyright 2004,2005,2006 Nicola Worthington
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+############################################################
+
 package Sys::Filesystem::Darwin;
+# vim:ts=4:sw=4:tw=78
 
 use strict;
-use warnings;
 use Carp qw(croak);
 
 use vars qw($VERSION);
-$VERSION = "0.1";
+$VERSION = '0.2' || sprintf('%d', q$Revision: 364 $ =~ /(\d+)/g);
 
 sub new {
 	my $class = shift;
-
 	my %args = @_;
 	my $self = { };
 
-	# Defaults
 	$args{disktool} ||= '/usr/sbin/disktool';
 
+	local $/ = "\n";
 	my @fslist = `$args{disktool} -l`;
 	croak "Cannot execute $args{disktool}: $!\n" unless ($! == 0);
 
@@ -33,7 +53,6 @@ sub new {
 		$self->{$mount_point}->{label} = $name;
 	}
 
-	# Bless and return
 	bless($self,$class);
 	return $self;
 }
@@ -109,7 +128,7 @@ For mounted FTP servers, disktool returns an empty filesystem type (ie, '').
 =head1 BUGS
 
 Doesn't take /etc/fstab or /etc/xtab into account right now, since they are 
-normally not used. Contact me if you need this.
+normally not used. Contact the author if you need this.
 
 =head1 SEE ALSO
 
@@ -117,7 +136,7 @@ L<Sys::Filesystem>, L<diskutil>
 
 =head1 VERSION
 
-$Id: Darwin.pm,v 1.3 2005/12/08 15:44:12 nicolaw Exp $
+$Id: Darwin.pm 364 2006-03-23 15:22:19Z nicolaw $
 
 =head1 AUTHOR
 
@@ -125,11 +144,11 @@ Christian Renz <crenz@web42.com>
 
 =head1 COPYRIGHT
 
-(c) Christian Renz 2004, 2005. This program is free software; you can redistribute
-it and/or modify it under the GNU GPL.
+Copyright 2004,2005,2006 Nicola Worthington.
 
-See the file COPYING in this distribution, or
-http://www.gnu.org/licenses/gpl.txt 
+This software is licensed under The Apache Software License, Version 2.0.
+
+L<http://www.apache.org/licenses/LICENSE-2.0>
 
 =cut
 

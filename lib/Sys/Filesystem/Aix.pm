@@ -1,45 +1,50 @@
-package Sys::Filesystem::AIX;
+############################################################
+#
+#   $Id: Aix.pm 364 2006-03-23 15:22:19Z nicolaw $
+#   Sys::Filesystem - Retrieve list of filesystems and their properties
+#
+#   Copyright 2004,2005,2006 Nicola Worthington
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+############################################################
 
-###############################################################################
-# Modules
+package Sys::Filesystem::AIX;
+# vim:ts=4:sw=4:tw=78
 
 use strict;
-use warnings;
 use FileHandle;
 use Carp qw(croak);
 
-
-
-###############################################################################
-# Globals and constants
-
 use vars qw($VERSION);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.2 $ =~ /(\d+)/g);
-
-
-
-##############################################################################
-# Public methods
+$VERSION = '1.03' || sprintf('%d', q$Revision: 364 $ =~ /(\d+)/g);
 
 sub new {
-	# Check we're being called correctly with a class name
 	ref(my $class = shift) && croak 'Class name required';
 	my %args = @_;
 	my $self = { };
 
-	# Defaults
 	$args{fstab} ||= '/etc/filesystems';
 
-	# Default fstab and mtab layout
 	my @fstab_keys = qw(account boot check dev free mount nodename size type vfs vol log);
+	my @special_fs = qw(swap proc tmpfs nfs mntfs autofs);
 
 	# Read the fstab
 	my $fstab = new FileHandle;
 	if ($fstab->open($args{fstab})) {
 		my $current_filesystem = '*UNDEFINED*';
 		while (<$fstab>) {
-			next if /^\s*#/;
-			next if /^\s*$/;
+			next if (/^\s*#/ || /^\s*$/);
 
 			# This doesn't allow for a mount point with a space in it
 			if (/^(\S+):\s*$/) {
@@ -50,8 +55,8 @@ sub new {
 			} elsif (my ($key,$value) = $_ =~ /^\s*([a-z]{3,8})\s+=\s+"?(.+)"?\s*$/) {
 				$self->{$current_filesystem}->{$key} = $value;
 				$self->{$current_filesystem}->{unmounted} = -1; # Unknown mount state?
-				
-				if ($key eq 'type' && grep(/^$value$/, qw(swap proc tmpfs nfs mntfs autofs))) {
+
+				if ($key eq 'type' && grep(/^$value$/, @special_fs)) {
 					$self->{$current_filesystem}->{special} = 1;
 				}
 			}
@@ -61,16 +66,11 @@ sub new {
 		croak "Unable to open fstab file ($args{fstab})\n";
 	}
 
-	# Bless and return
 	bless($self,$class);
 	return $self;
 }
 
 1;
-
-
-###############################################################################
-# POD
 
 =pod
 
@@ -158,21 +158,21 @@ L<Sys::Filesystem>
 
 =head1 VERSION
 
-$Id: AIX.pm,v 1.2 2005/12/08 15:44:12 nicolaw Exp $
+$Id: Aix.pm 364 2006-03-23 15:22:19Z nicolaw $
 
 =head1 AUTHOR
 
 Nicola Worthington <nicolaw@cpan.org>
 
-perlgirl.org.uk
+L<perlgirl.org.uk>
 
 =head1 COPYRIGHT
 
-(c) Nicola Worthington 204, 2005. This program is free software; you can
-redistribute it and/or modify it under the GNU GPL.
+Copyright 2004,2005,2006 Nicola Worthington.
 
-See the file COPYING in this distribution, or
-http://www.gnu.org/licenses/gpl.txt 
+This software is licensed under The Apache Software License, Version 2.0.
+
+L<http://www.apache.org/licenses/LICENSE-2.0>
 
 =cut
 

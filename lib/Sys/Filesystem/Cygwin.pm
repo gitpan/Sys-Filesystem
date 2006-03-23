@@ -1,62 +1,66 @@
-package Sys::Filesystem::Cygwin;
+############################################################
+#
+#   $Id: Cygwin.pm 364 2006-03-23 15:22:19Z nicolaw $
+#   Sys::Filesystem - Retrieve list of filesystems and their properties
+#
+#   Copyright 2004,2005,2006 Nicola Worthington
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+############################################################
 
-###############################################################################
-# Modules
+package Sys::Filesystem::Cygwin;
+# vim:ts=4:sw=4:tw=78
 
 use strict;
-use warnings;
 use FileHandle;
 use Carp qw(croak);
 
-
-
-###############################################################################
-# Globals and constants
-
 use vars qw($VERSION);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.6 $ =~ /(\d+)/g);
-
-
-
-##############################################################################
-# Public methods
+$VERSION = '1.07' || sprintf('%d', q$Revision: 364 $ =~ /(\d+)/g);
 
 sub new {
-	# Check we're being called correctly with a class name
 	ref(my $class = shift) && croak 'Class name required';
 	my %args = @_;
 	my $self = { };
 
-	# Default mtab and mtab layout
+	local $/ = "\n";
 	my @keys = qw(fs_spec fs_file fs_vfstype fs_mntops);
+	my @special_fs = qw(swap proc devpts tmpfs);
 
-	# Read the mtab
 	my $mtab = new FileHandle;
 	if ($mtab->open('mount|')) {
 		while (<$mtab>) {
-			next if /^\s*#/;
-			next if /^\s*$/;
+			next if (/^\s*#/ || /^\s*$/);
 			if (my @vals = $_ =~ /^\s*(.+?) on (\/.+?) type (\S+) \((\S+)\)\s*$/) {
 				$self->{$vals[1]}->{mounted} = 1;
-				$self->{$vals[1]}->{special} = 1 if grep(/^$vals[2]$/,qw(swap proc devpts tmpfs));
+				$self->{$vals[1]}->{special} = 1 if grep(/^$vals[2]$/,@special_fs);
 				for (my $i = 0; $i < @keys; $i++) {
 					$self->{$vals[1]}->{$keys[$i]} = $vals[$i];
 				}
 			}
 		}
 		$mtab->close;
+
 	} else {
-		croak "Unable to open pipe handle for mount command\n";
+		croak "Unable to open pipe handle for mount command: $!\n";
 	}
 
-	# Bless and return
 	bless($self,$class);
 	return $self;
 }
 
 1;
-
-
 
 #worthn01@PC-L438082~ $ mount
 #d:\cygwin\bin on /usr/bin type user (binmode)
@@ -71,11 +75,6 @@ sub new {
 #s: on /cygdrive/s type user (binmode,noumount)
 #z: on /cygdrive/z type user (binmode,noumount)
 #worthn01@PC-L438082~ $
-
-
-
-###############################################################################
-# POD
 
 =pod
 
@@ -118,21 +117,21 @@ L<http://cygwin.com/cygwin-ug-net/using.html>
 
 =head1 VERSION
 
-$Id: Cygwin.pm,v 1.6 2005/12/08 15:44:12 nicolaw Exp $
+$Id: Cygwin.pm 364 2006-03-23 15:22:19Z nicolaw $
 
 =head1 AUTHOR
 
 Nicola Worthington <nicolaw@cpan.org>
 
-http://perlgirl.org.uk
+L<http://perlgirl.org.uk>
 
 =head1 COPYRIGHT
 
-(c) Nicola Worthington 2004, 2005. This program is free software; you can
-redistribute it and/or modify it under the GNU GPL.
+Copyright 2004,2005,2006 Nicola Worthington.
 
-See the file COPYING in this distribution, or
-http://www.gnu.org/licenses/gpl.txt 
+This software is licensed under The Apache Software License, Version 2.0.
+
+L<http://www.apache.org/licenses/LICENSE-2.0>
 
 =cut
 

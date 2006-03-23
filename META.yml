@@ -1,12 +1,47 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Sys-Filesystem
-version:      1.18
-version_from: lib/Sys/Filesystem.pm
-installdirs:  site
+---
+name: Sys-Filesystem
+version: 1.19
+author:
+  - Nicola Worthington <nicolaw@cpan.org>
+abstract: Retrieve list of filesystems and their properties
+license: open_source
 requires:
-    Carp:                          0
-    FileHandle:                    0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+  Carp: 0
+  FileHandle: 0
+build_requires:
+  Test: 0
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  Sys::Filesystem:
+    file: lib/Sys/Filesystem.pm
+    version: 1.19
+  Sys::Filesystem::AIX:
+    file: lib/Sys/Filesystem/Aix.pm
+    version: 1.03
+  Sys::Filesystem::Cygwin:
+    file: lib/Sys/Filesystem/Cygwin.pm
+    version: 1.07
+  Sys::Filesystem::Darwin:
+    file: lib/Sys/Filesystem/Darwin.pm
+    version: 0.2
+  Sys::Filesystem::Dummy:
+    file: lib/Sys/Filesystem/Dummy.pm
+    version: 1.06
+  Sys::Filesystem::Freebsd:
+    file: lib/Sys/Filesystem/Freebsd.pm
+    version: 1.05
+  Sys::Filesystem::Linux:
+    file: lib/Sys/Filesystem/Linux.pm
+    version: 1.13
+  Sys::Filesystem::Solaris:
+    file: lib/Sys/Filesystem/Solaris.pm
+    version: 1.13
+  Sys::Filesystem::Unix:
+    file: lib/Sys/Filesystem/Unix.pm
+    version: 1.05
+  Sys::Filesystem::Win32:
+    file: lib/Sys/Filesystem/Mswin32.pm
+    version: 1.04
+generated_by: Module::Build version 0.2611

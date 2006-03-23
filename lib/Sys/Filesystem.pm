@@ -1,50 +1,34 @@
 ############################################################
-# $Id: Filesystem.pm,v 1.18 2005/12/29 18:02:09 nicolaw Exp $
-# Sys::Filesystem - Retrieve list of filesystems and their properties
-# Copyright: (c)2004,2005 Nicola Worthington. All rights reserved.
-############################################################
-# This file is part of Sys::Filesystem.
 #
-# Sys::Filesystem is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
+#   $Id: Filesystem.pm 364 2006-03-23 15:22:19Z nicolaw $
+#   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
-# Sys::Filesystem is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#   Copyright 2004,2005,2006 Nicola Worthington
 #
-# You should have received a copy of the GNU General Public License
-# along with Sys::Filesystem; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
 ############################################################
 
 package Sys::Filesystem;
 # vim:ts=4:sw=4:tw=78
 
-###############################################################################
-# Modules
-
 use strict;
-use warnings;
-use English;
 use FileHandle;
 use Carp qw(croak cluck confess);
 
-
-
-###############################################################################
-# Globals and constants
-
 use constant DEBUG => $ENV{DEBUG} ? 1 : 0;
 use vars qw($VERSION $AUTOLOAD);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.18 $ =~ /(\d+)/g);
-
-
-
-###############################################################################
-# Public methods
+$VERSION = '1.19' || sprintf('%d', q$Revision: 364 $ =~ /(\d+)/g);
 
 sub new {
 	# Check we're being called correctly with a class name
@@ -63,18 +47,21 @@ sub new {
 
 	# How to query
 	my $self = { %args };
-	$self->{osname} = $OSNAME;
-	my @query_order = ($self->{osname});
-	push @query_order, $self->{osname} eq 'MSWin32' ? 'Win32' : 'Unix';
+	$self->{osname} = $^O;
+	my @query_order = (ucfirst($self->{osname}));
+	push @query_order, $self->{osname} =~ /Win32/i ? 'Win32' : 'Unix';
 	push @query_order, 'Dummy';
 
 	# Try and query
 	for (@query_order) {
-		$self->{filesystems} ||= eval sprintf('require %s::%s; %s::%s->new(%%args);',
-						__PACKAGE__, _caps($_),
-						__PACKAGE__, _caps($_)
-					);
-		cluck($@) if $@;
+		my $obj = undef;
+		my $code = sprintf('require %s::%s; $obj = %s::%s->new(%%args);',
+						__PACKAGE__, $_, __PACKAGE__, $_);
+		eval { eval($code); };
+		if (defined $obj && ref($obj) && !$@) {
+			$self->{filesystems} = $obj;
+			last;
+		}
 	}
 
 	# Filesystem property aliases
@@ -90,16 +77,6 @@ sub new {
 			boot_order      => [ qw(fs_mntno) ],
 			volume          => [ qw(fs_volume fs_vol vol) ],
 			label           => [ qw(fs_label) ],
-		};
-
-	# Information
-	$self->{software} = {
-			Caller => [ caller ],
-			Package => __PACKAGE__,
-			Version => $VERSION,
-			Author => '$Author: nicolaw $',
-			Revision => '$Revision: 1.18 $',
-			Id => '$Id: Filesystem.pm,v 1.18 2005/12/29 18:02:09 nicolaw Exp $',
 		};
 
 	# Debug
@@ -207,17 +184,6 @@ sub AUTOLOAD {
 	return undef;
 }
 
-
-
-###############################################################################
-# Private methods
-
-sub _caps {
-	my $str = shift;
-	$str =~ s/\b(\w)/\U$1\E/g;
-	return $str;
-}
-
 sub TRACE {
 	return unless DEBUG;
 	warn(shift());
@@ -230,14 +196,7 @@ sub DUMP {
 	}
 }
 
-
-
 1;
-
-
-
-###############################################################################
-# POD
 
 =pod
 
@@ -248,7 +207,6 @@ Sys::Filesystem - Retrieve list of filesystems and their properties
 =head1 SYNOPSIS
 
     use strict;
-    use warnings;
     use Sys::Filesystem ();
     
     # Method 1
@@ -513,7 +471,7 @@ L<perlport>, L<Solaris::DeviceTree>, L<Win32::DriveInfo>
 
 =head1 VERSION
 
-$Id: Filesystem.pm,v 1.18 2005/12/29 18:02:09 nicolaw Exp $
+$Id: Filesystem.pm 364 2006-03-23 15:22:19Z nicolaw $
 
 =head1 AUTHOR
 
@@ -535,84 +493,11 @@ L<http://www.unixguide.net/unixguide.shtml>
 
 =head1 COPYRIGHT
 
-(c) Nicola Worthington 2004,2005. This program is free software; you can
-redistribute it and/or modify it under the GNU GPL.
+Copyright 2004,2005,2006 Nicola Worthington.
 
-See the file COPYING in this distribution, or
-L<http://www.gnu.org/licenses/gpl.txt>
+This software is licensed under The Apache Software License, Version 2.0.
+
+L<http://www.apache.org/licenses/LICENSE-2.0>
 
 =cut
-
-
-
-###############################################################################
-# End
-
-__DATA__
-
-__END__
- 
-
-
-###############################################################################
-# CVS changelog
-
-$Log: Filesystem.pm,v $
-Revision 1.18  2005/12/29 18:02:09  nicolaw
-*** empty log message ***
-
-Revision 1.17  2005/12/08 17:30:29  nicolaw
-*** empty log message ***
-
-Revision 1.16  2005/12/08 15:44:11  nicolaw
-Modified POD
-
-Revision 1.15  2005/12/02 16:06:51  nicolaw
-Updated for revision number and email address
-
-Revision 1.14  2005/01/30 18:10:41  nicolaw
-Added some new filesystem property aliases and reference to AIX helper module
-
-Revision 1.13  2005/01/26 14:25:45  nicolaw
-Added extra documentation and the device option for the filesystems
-method.
-
-Revision 1.12  2005/01/13 23:37:07  nicolaw
-Updated POD.
-
-Revision 1.11  2004/10/06 16:24:58  nicolaw
-*** empty log message ***
-
-Revision 1.10  2004/10/06 15:25:00  nicolaw
-Fix from Win32 to MSWin32
-
-Revision 1.9  2004/10/05 14:12:38  nicolaw
-POD whitespace fix
-
-Revision 1.8  2004/09/30 14:03:43  nicolaw
-Added the regular_filesystems() method
-
-Revision 1.7  2004/09/30 13:12:00  nicolaw
-Added a DESTROY stub so that AUTO_LOAD doesn't catch it and complain that
-it doesn't have a filename to play with
-
-Revision 1.6  2004/09/29 12:01:23  nicolaw
-Added aliases and condition of Unix module not if Win32
-
-Revision 1.5  2004/09/29 10:43:12  nicolaw
-Added POD
-
-Revision 1.4  2004/09/28 16:35:31  nicolaw
-*** empty log message ***
-
-Revision 1.3  2004/09/28 16:01:22  nicolaw
-*** empty log message ***
-
-Revision 1.2  2004/09/28 14:30:18  nicolaw
-*** empty log message ***
-
-Revision 1.1  2004/09/28 13:53:20  nicolaw
-*** empty log message ***
-
-
 

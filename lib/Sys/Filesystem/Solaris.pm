@@ -1,53 +1,63 @@
-package Sys::Filesystem::Solaris;
+############################################################
+#
+#   $Id: Solaris.pm 364 2006-03-23 15:22:19Z nicolaw $
+#   Sys::Filesystem - Retrieve list of filesystems and their properties
+#
+#   Copyright 2004,2005,2006 Nicola Worthington
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+############################################################
 
-###############################################################################
-# Modules
+package Sys::Filesystem::Solaris;
+# vim:ts=4:sw=4:tw=78
 
 use strict;
-use warnings;
 use FileHandle;
+use Fcntl qw(:flock);
 use Carp qw(croak);
 
-
-
-###############################################################################
-# Globals and constants
-
 use vars qw($VERSION);
-$VERSION = sprintf('%d.%02d', q$Revision: 1.12 $ =~ /(\d+)/g);
-
-
-
-##############################################################################
-# Public methods
+$VERSION = '1.13' || sprintf('%d', q$Revision: 364 $ =~ /(\d+)/g);
 
 sub new {
-	# Check we're being called correctly with a class name
 	ref(my $class = shift) && croak 'Class name required';
 	my %args = @_;
 	my $self = { };
 
-	# Defaults
 	$args{fstab} ||= '/etc/vfstab';
 	$args{mtab} ||= '/etc/mnttab';
 	#$args{xtab} ||= '/etc/lib/nfs/xtab';
 
-	# Default fstab and mtab layout
 	my @fstab_keys = qw(device device_to_fsck mount_point fs_vfstype fs_freq mount_at_boot fs_mntops);
 	my @mtab_keys = qw(device mount_point fs_vfstype fs_mntops time);
+
+	my @special_fs = qw(swap proc tmpfs nfs mntfs autofs lofs cachefs);
+	local $/ = "\n";
 
 	# Read the fstab
 	my $fstab = new FileHandle;
 	if ($fstab->open($args{fstab})) {
 		while (<$fstab>) {
-			next if /^\s*#/;
-			next if /^\s*$/;
+			next if (/^\s*#/ || /^\s*$/);
 			my @vals = split(/\s+/, $_);
+			next if "-" eq $vals[2];
+
 			for (my $i = 0; $i < @fstab_keys; $i++) {
 				$vals[$i] = '' unless defined $vals[$i];
 			}
 			$self->{$vals[2]}->{unmounted} = 1;
-			$self->{$vals[2]}->{special} = 1 if grep(/^$vals[3]$/,qw(swap proc tmpfs nfs mntfs autofs));
+			$self->{$vals[2]}->{special} = 1 if grep(/^$vals[3]$/,@special_fs);
 			for (my $i = 0; $i < @fstab_keys; $i++) {
 				$self->{$vals[2]}->{$fstab_keys[$i]} = $vals[$i];
 			}
@@ -59,14 +69,15 @@ sub new {
 
 	# Read the mtab
 	my $mtab = new FileHandle;
-	if ($mtab->open($args{mtab})) {
+	#if ($mtab->open($args{mtab})) {
+	if ($mtab->open($args{mtab}) && flock $mtab, LOCK_SH | LOCK_NB) {
 		while (<$mtab>) {
 			next if /^\s*#/;
 			next if /^\s*$/;
 			my @vals = split(/\s+/, $_);
 			delete $self->{$vals[1]}->{unmounted} if exists $self->{$vals[1]}->{unmounted};
 			$self->{$vals[1]}->{mounted} = 1;
-			$self->{$vals[1]}->{special} = 1 if grep(/^$vals[2]$/,qw(swap proc tmpfs nfs mntfs autofs));
+			$self->{$vals[1]}->{special} = 1 if grep(/^$vals[2]$/,@special_fs);
 			for (my $i = 0; $i < @mtab_keys; $i++) {
 				$self->{$vals[1]}->{$mtab_keys[$i]} = $vals[$i];
 			}
@@ -76,16 +87,11 @@ sub new {
 		croak "Unable to open mtab file ($args{mtab})\n";
 	}
 
-	# Bless and return
 	bless($self,$class);
 	return $self;
 }
 
 1;
-
-
-###############################################################################
-# POD
 
 =pod
 
@@ -145,21 +151,21 @@ L<Solaris::DeviceTree>
 
 =head1 VERSION
 
-$Id: Solaris.pm,v 1.12 2005/12/08 15:44:12 nicolaw Exp $
+$Id: Solaris.pm 364 2006-03-23 15:22:19Z nicolaw $
 
 =head1 AUTHOR
 
 Nicola Worthington <nicolaworthington@msn.com>
 
-http://perlgirl.org.uk
+L<http://perlgirl.org.uk>
 
 =head1 COPYRIGHT
 
-(c) Nicola Worthington 2004, 2005. This program is free software; you can
-redistribute it and/or modify it under the GNU GPL.
+Copyright 2004,2005,2006 Nicola Worthington.
 
-See the file COPYING in this distribution, or
-http://www.gnu.org/licenses/gpl.txt 
+This software is licensed under The Apache Software License, Version 2.0.
+
+L<http://www.apache.org/licenses/LICENSE-2.0>
 
 =cut
 
