@@ -1,6 +1,6 @@
 ---
 name: Sys-Filesystem
-version: 1.19
+version: 1.20
 author:
   - Nicola Worthington <nicolaw@cpan.org>
 abstract: Retrieve list of filesystems and their properties
@@ -16,10 +16,10 @@ build_requires:
 provides:
   Sys::Filesystem:
     file: lib/Sys/Filesystem.pm
-    version: 1.19
-  Sys::Filesystem::AIX:
+    version: 1.20
+  Sys::Filesystem::Aix:
     file: lib/Sys/Filesystem/Aix.pm
-    version: 1.03
+    version: 1.04
   Sys::Filesystem::Cygwin:
     file: lib/Sys/Filesystem/Cygwin.pm
     version: 1.07
@@ -35,13 +35,13 @@ provides:
   Sys::Filesystem::Linux:
     file: lib/Sys/Filesystem/Linux.pm
     version: 1.13
+  Sys::Filesystem::Mswin32:
+    file: lib/Sys/Filesystem/Mswin32.pm
+    version: 1.05
   Sys::Filesystem::Solaris:
     file: lib/Sys/Filesystem/Solaris.pm
     version: 1.13
   Sys::Filesystem::Unix:
     file: lib/Sys/Filesystem/Unix.pm
     version: 1.05
-  Sys::Filesystem::Win32:
-    file: lib/Sys/Filesystem/Mswin32.pm
-    version: 1.04
 generated_by: Module::Build version 0.2611

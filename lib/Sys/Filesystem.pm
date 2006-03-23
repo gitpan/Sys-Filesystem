@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Filesystem.pm 364 2006-03-23 15:22:19Z nicolaw $
+#   $Id: Filesystem.pm 368 2006-03-23 17:38:56Z nicolaw $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -28,7 +28,7 @@ use Carp qw(croak cluck confess);
 
 use constant DEBUG => $ENV{DEBUG} ? 1 : 0;
 use vars qw($VERSION $AUTOLOAD);
-$VERSION = '1.19' || sprintf('%d', q$Revision: 364 $ =~ /(\d+)/g);
+$VERSION = '1.20' || sprintf('%d', q$Revision: 368 $ =~ /(\d+)/g);
 
 sub new {
 	# Check we're being called correctly with a class name
@@ -102,7 +102,13 @@ sub filesystems {
 	my $params = { @_ };
 	for my $param (keys %{$params}) {
 		croak "Illegal paramater '$param' passed to filesystems() method"
-			unless grep(/^$param$/, qw(mounted unmounted special device));
+			unless grep(/^$param$/, qw(mounted unmounted special device regular));
+	}
+
+	# Invert logic for regular
+	if (exists $params->{regular}) {
+		delete $params->{regular};
+		$params->{regular} = undef;
 	}
 
 	my @filesystems = ();
@@ -366,6 +372,10 @@ available to query under Linux.
 Returns the friendly name of the filesystem. This will usually be the same
 name as appears in the list returned by the filesystems() method.
 
+=item mounted()
+
+Returns boolean true if the filesystem is mounted.
+
 =item label()
 
 Returns the fileystem label.
@@ -383,6 +393,10 @@ helper modules as of Sys::Filesystem 1.12.
 =item device()
 
 Returns the physical device that the filesystem is connected to.
+
+=item special()
+
+Returns boolean true if the filesystem type is considered "special".
 
 =item type() or format()
 
@@ -471,7 +485,7 @@ L<perlport>, L<Solaris::DeviceTree>, L<Win32::DriveInfo>
 
 =head1 VERSION
 
-$Id: Filesystem.pm 364 2006-03-23 15:22:19Z nicolaw $
+$Id: Filesystem.pm 368 2006-03-23 17:38:56Z nicolaw $
 
 =head1 AUTHOR
 

@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Aix.pm 364 2006-03-23 15:22:19Z nicolaw $
+#   $Id: Aix.pm 368 2006-03-23 17:38:56Z nicolaw $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -19,7 +19,7 @@
 #
 ############################################################
 
-package Sys::Filesystem::AIX;
+package Sys::Filesystem::Aix;
 # vim:ts=4:sw=4:tw=78
 
 use strict;
@@ -27,7 +27,7 @@ use FileHandle;
 use Carp qw(croak);
 
 use vars qw($VERSION);
-$VERSION = '1.03' || sprintf('%d', q$Revision: 364 $ =~ /(\d+)/g);
+$VERSION = '1.04' || sprintf('%d', q$Revision: 368 $ =~ /(\d+)/g);
 
 sub new {
 	ref(my $class = shift) && croak 'Class name required';
@@ -76,7 +76,7 @@ sub new {
 
 =head1 NAME
 
-Sys::Filesystem::AIX - Return AIX filesystem information to Sys::Filesystem
+Sys::Filesystem::Aix - Return AIX filesystem information to Sys::Filesystem
 
 =head1 SYNOPSIS
 
@@ -158,7 +158,7 @@ L<Sys::Filesystem>
 
 =head1 VERSION
 
-$Id: Aix.pm 364 2006-03-23 15:22:19Z nicolaw $
+$Id: Aix.pm 368 2006-03-23 17:38:56Z nicolaw $
 
 =head1 AUTHOR
 

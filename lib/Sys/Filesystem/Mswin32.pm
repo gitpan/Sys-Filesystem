@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Mswin32.pm 364 2006-03-23 15:22:19Z nicolaw $
+#   $Id: Mswin32.pm 368 2006-03-23 17:38:56Z nicolaw $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -19,7 +19,7 @@
 #
 ############################################################
 
-package Sys::Filesystem::Win32;
+package Sys::Filesystem::Mswin32;
 # vim:ts=4:sw=4:tw=78
 
 use strict;
@@ -28,7 +28,7 @@ use Win32::DriveInfo;
 use Carp qw(croak);
 
 use vars qw($VERSION);
-$VERSION = '1.04' || sprintf('%d', q$Revision: 364 $ =~ /(\d+)/g);
+$VERSION = '1.05' || sprintf('%d', q$Revision: 368 $ =~ /(\d+)/g);
 
 sub new {
 	ref(my $class = shift) && croak 'Class name required';
@@ -60,7 +60,7 @@ sub new {
 
 =head1 NAME
 
-Sys::Filesystem::Win32 - Return Win32 filesystem information to Sys::Filesystem
+Sys::Filesystem::Mswin32 - Return Win32 filesystem information to Sys::Filesystem
 
 =head1 SYNOPSIS
 
@@ -68,7 +68,7 @@ See L<Sys::Filesystem>.
 
 =head1 VERSION
 
-$Id: Mswin32.pm 364 2006-03-23 15:22:19Z nicolaw $
+$Id: Mswin32.pm 368 2006-03-23 17:38:56Z nicolaw $
 
 =head1 AUTHOR
 

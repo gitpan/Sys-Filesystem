@@ -131,6 +131,9 @@ METHODS
         the same name as appears in the list returned by the filesystems()
         method.
 
+    mounted()
+        Returns boolean true if the filesystem is mounted.
+
     label()
         Returns the fileystem label.
 
@@ -145,6 +148,9 @@ METHODS
 
     device()
         Returns the physical device that the filesystem is connected to.
+
+    special()
+        Returns boolean true if the filesystem type is considered "special".
 
     type() or format()
         Returns the type of filesystem format. fat32, ntfs, ufs, hpfs, ext3,
@@ -218,7 +224,7 @@ SEE ALSO
     perlport, Solaris::DeviceTree, Win32::DriveInfo
 
 VERSION
-    $Id: Filesystem.pm 364 2006-03-23 15:22:19Z nicolaw $
+    $Id: Filesystem.pm 368 2006-03-23 17:38:56Z nicolaw $
 
 AUTHOR
     Nicola Worthington <nicolaw@cpan.org>
