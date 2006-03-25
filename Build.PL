@@ -21,7 +21,7 @@ $build = Module::Build->new(
 				) : () ),
 		},
 
-		build_requires => {
+		recommends => {
 			'Test'                => 0,
 			'Test::More'          => 0,
 			'Test::Pod'           => 0,
@@ -43,7 +43,7 @@ if ($url) {
 		local $SIG{ALRM} = sub { die; };
 		alarm 10;
 		my $ua = LWP::UserAgent->new(
-				agent => 'Build.PL $Revision: 361 $',
+				agent => 'Build.PL $Revision: 380 $',
 				timeout => 9,
 				max_size => 500,
 			);

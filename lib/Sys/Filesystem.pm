@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Filesystem.pm 368 2006-03-23 17:38:56Z nicolaw $
+#   $Id: Filesystem.pm 381 2006-03-25 20:42:44Z nicolaw $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -28,7 +28,7 @@ use Carp qw(croak cluck confess);
 
 use constant DEBUG => $ENV{DEBUG} ? 1 : 0;
 use vars qw($VERSION $AUTOLOAD);
-$VERSION = '1.20' || sprintf('%d', q$Revision: 368 $ =~ /(\d+)/g);
+$VERSION = '1.21' || sprintf('%d', q$Revision: 381 $ =~ /(\d+)/g);
 
 sub new {
 	# Check we're being called correctly with a class name
@@ -485,7 +485,7 @@ L<perlport>, L<Solaris::DeviceTree>, L<Win32::DriveInfo>
 
 =head1 VERSION
 
-$Id: Filesystem.pm 368 2006-03-23 17:38:56Z nicolaw $
+$Id: Filesystem.pm 381 2006-03-25 20:42:44Z nicolaw $
 
 =head1 AUTHOR
 

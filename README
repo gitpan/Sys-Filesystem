@@ -224,7 +224,7 @@ SEE ALSO
     perlport, Solaris::DeviceTree, Win32::DriveInfo
 
 VERSION
-    $Id: Filesystem.pm 368 2006-03-23 17:38:56Z nicolaw $
+    $Id: Filesystem.pm 381 2006-03-25 20:42:44Z nicolaw $
 
 AUTHOR
     Nicola Worthington <nicolaw@cpan.org>
