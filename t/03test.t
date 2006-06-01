@@ -12,12 +12,15 @@ chdir 't' if -d 't';
 
 	my @mounted_filesystems;
 	my @mounted_filesystems2;
-	ok(@mounted_filesystems  = $fs->mounted_filesystems, 'Get list of mounted filesystems');
-	ok(@mounted_filesystems2 = $fs->filesystems(mounted => 1),'Mounted2');
-	ok("@mounted_filesystems" eq "@mounted_filesystems2",'Compare mounted');
+	@mounted_filesystems = $fs->mounted_filesystems;
+	@mounted_filesystems2 = $fs->filesystems(mounted => 1);
+	ok("@mounted_filesystems" eq "@mounted_filesystems2",'Compare mounted methods');
 
-	ok(my @unmounted_filesystems = $fs->unmounted_filesystems, 'Get list of unmounted filesystems');
-	ok(my @special_filesystems   = $fs->special_filesystems, 'Get list of special filesystems');
+	#ok(my @unmounted_filesystems = $fs->unmounted_filesystems, 'Get list of unmounted filesystems');
+	#ok(my @special_filesystems   = $fs->special_filesystems, 'Get list of special filesystems');
+	my @unmounted_filesystems = $fs->unmounted_filesystems;
+	my @special_filesystems   = $fs->special_filesystems;
+
 	ok(my @regular_filesystems   = $fs->regular_filesystems, 'Get list of regular filesystems');
 	ok(my @filesystems           = $fs->filesystems, 'Get list of all filesystems');
 

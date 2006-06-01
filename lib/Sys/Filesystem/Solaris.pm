@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Solaris.pm 364 2006-03-23 15:22:19Z nicolaw $
+#   $Id: Solaris.pm 562 2006-06-01 11:14:15Z nicolaw $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -28,7 +28,7 @@ use Fcntl qw(:flock);
 use Carp qw(croak);
 
 use vars qw($VERSION);
-$VERSION = '1.13' || sprintf('%d', q$Revision: 364 $ =~ /(\d+)/g);
+$VERSION = '1.13' || sprintf('%d', q$Revision: 562 $ =~ /(\d+)/g);
 
 sub new {
 	ref(my $class = shift) && croak 'Class name required';
@@ -42,7 +42,7 @@ sub new {
 	my @fstab_keys = qw(device device_to_fsck mount_point fs_vfstype fs_freq mount_at_boot fs_mntops);
 	my @mtab_keys = qw(device mount_point fs_vfstype fs_mntops time);
 
-	my @special_fs = qw(swap proc tmpfs nfs mntfs autofs lofs cachefs);
+	my @special_fs = qw(swap proc procfs tmpfs nfs mntfs autofs lofs fd ctfs devfs objfs cachefs);
 	local $/ = "\n";
 
 	# Read the fstab
@@ -151,7 +151,7 @@ L<Solaris::DeviceTree>
 
 =head1 VERSION
 
-$Id: Solaris.pm 364 2006-03-23 15:22:19Z nicolaw $
+$Id: Solaris.pm 562 2006-06-01 11:14:15Z nicolaw $
 
 =head1 AUTHOR
 

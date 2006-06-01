@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Filesystem.pm 381 2006-03-25 20:42:44Z nicolaw $
+#   $Id: Filesystem.pm 574 2006-06-01 19:02:44Z nicolaw $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -28,7 +28,7 @@ use Carp qw(croak cluck confess);
 
 use constant DEBUG => $ENV{DEBUG} ? 1 : 0;
 use vars qw($VERSION $AUTOLOAD);
-$VERSION = '1.21' || sprintf('%d', q$Revision: 381 $ =~ /(\d+)/g);
+$VERSION = '1.22' || sprintf('%d', q$Revision: 574 $ =~ /(\d+)/g);
 
 sub new {
 	# Check we're being called correctly with a class name
@@ -69,8 +69,8 @@ sub new {
 			device          => [ qw(fs_spec dev) ],
 			filesystem      => [ qw(fs_file mount_point) ],
 			mount_point     => [ qw(fs_file filesystem) ],
-			type            => [ qw(fs_vfstype) ],
-			format          => [ qw(fs_vfstype vfs) ],
+			type            => [ qw(fs_vfstype vfs) ],
+			format          => [ qw(fs_vfstype vfs vfstype) ],
 			options         => [ qw(fs_mntops) ],
 			check_frequency => [ qw(fs_freq) ],
 			check_order     => [ qw(fs_passno) ],
@@ -108,7 +108,7 @@ sub filesystems {
 	# Invert logic for regular
 	if (exists $params->{regular}) {
 		delete $params->{regular};
-		$params->{regular} = undef;
+		$params->{special} = undef;
 	}
 
 	my @filesystems = ();
@@ -432,8 +432,6 @@ Sys::Filesystem module if no suitable platform specific module can be found
 or sucessfully loaded. This is the last module to be tried, in order of
 platform, Unix (if not on Win32), and then Dummy.
 
-Maintained by Nicola Worthington.
-
 =head2 Unix
 
 The Unix module is intended to provide a "best guess" failover result to the
@@ -442,30 +440,25 @@ found, and the platform is not 'MSWin32'.
 
 This module requires additional work to improve it's guestimation abilities.
 
-=head2 Linux
-
-Maintained by Nicola Worthington.
-
 =head2 Darwin
 
-Written and maintained by Christian Renz <crenz@web42.com>.
-
-=head2 Solaris
-
-Initial revision written by Nicola Worthington. Please contact me if you
-would like to maintain this.
-
-=head2 AIX
-
-Initial revision written by Nicola Worthington. Please contact me if you
-would like to maintain this.
+Frist written by Christian Renz <crenz@web42.com>.
 
 =head2 Win32
 
-Initial revision written by Nicola Worthington. Please contact me if you
-would like to maintain this.
-
 This isn't written yet. It's on the top of the (very slow) TODO list.
+
+=head2 AIX
+
+Please be aware that the AIX /etc/filesystems file has both a "type" and
+"vfs" field. The "type" field should not be confused with the filesystem
+format/type (that is stored in the "vfs" field). You may wish to use the
+"format" field when querying for filesystem types, since it is aliased to
+be more reliable accross different platforms.
+
+=head2 Other
+
+Linux, Solaris, Cygwin, FreeBSD.
 
 =head2 OS Identifiers
 
@@ -485,7 +478,7 @@ L<perlport>, L<Solaris::DeviceTree>, L<Win32::DriveInfo>
 
 =head1 VERSION
 
-$Id: Filesystem.pm 381 2006-03-25 20:42:44Z nicolaw $
+$Id: Filesystem.pm 574 2006-06-01 19:02:44Z nicolaw $
 
 =head1 AUTHOR
 
@@ -495,15 +488,7 @@ L<http://perlgirl.org.uk>
 
 =head1 ACKNOWLEDGEMENTS
 
-Christian Renz <crenz@web42.com> is the maintainer
-of L<Sys::Filesystem::Darwin>.
-
-Brad Greenlee <brad@footle.org> for suggesting and patching for the
-filesystem(device => "string") method functionality.
-
-L<http://publib.boulder.ibm.com/infocenter/pseries/index.jsp?topic=/com.ibm.aix.doc/files/aixfiles/filesystems.htm>
-
-L<http://www.unixguide.net/unixguide.shtml>
+See CREDITS in the distribution tarball.
 
 =head1 COPYRIGHT
 

@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Aix.pm 368 2006-03-23 17:38:56Z nicolaw $
+#   $Id: Aix.pm 572 2006-06-01 18:57:59Z nicolaw $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -27,7 +27,7 @@ use FileHandle;
 use Carp qw(croak);
 
 use vars qw($VERSION);
-$VERSION = '1.04' || sprintf('%d', q$Revision: 368 $ =~ /(\d+)/g);
+$VERSION = '1.04' || sprintf('%d', q$Revision: 572 $ =~ /(\d+)/g);
 
 sub new {
 	ref(my $class = shift) && croak 'Class name required';
@@ -37,7 +37,7 @@ sub new {
 	$args{fstab} ||= '/etc/filesystems';
 
 	my @fstab_keys = qw(account boot check dev free mount nodename size type vfs vol log);
-	my @special_fs = qw(swap proc tmpfs nfs mntfs autofs);
+	my @special_fs = qw(swap procfs proc tmpfs nfs mntfs autofs);
 
 	# Read the fstab
 	my $fstab = new FileHandle;
@@ -46,8 +46,8 @@ sub new {
 		while (<$fstab>) {
 			next if (/^\s*#/ || /^\s*$/);
 
-			# This doesn't allow for a mount point with a space in it
-			if (/^(\S+):\s*$/) {
+			# Found a new filesystem group
+			if (/^\s*(.+?):\s*$/) {
 				$current_filesystem = $1;
 				$self->{$current_filesystem}->{filesystem} = $1;
 
@@ -55,9 +55,10 @@ sub new {
 			} elsif (my ($key,$value) = $_ =~ /^\s*([a-z]{3,8})\s+=\s+"?(.+)"?\s*$/) {
 				$self->{$current_filesystem}->{$key} = $value;
 				$self->{$current_filesystem}->{unmounted} = -1; # Unknown mount state?
-
-				if ($key eq 'type' && grep(/^$value$/, @special_fs)) {
-					$self->{$current_filesystem}->{special} = 1;
+				if ($key eq 'vfs') {
+					if (grep(/^$value$/, @special_fs)) {
+						$self->{$current_filesystem}->{special} = 1;
+					}
 				}
 			}
 		}
@@ -158,7 +159,7 @@ L<Sys::Filesystem>
 
 =head1 VERSION
 
-$Id: Aix.pm 368 2006-03-23 17:38:56Z nicolaw $
+$Id: Aix.pm 572 2006-06-01 18:57:59Z nicolaw $
 
 =head1 AUTHOR
 

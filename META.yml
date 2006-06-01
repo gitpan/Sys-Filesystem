@@ -1,6 +1,6 @@
 ---
 name: Sys-Filesystem
-version: 1.21
+version: 1.22
 author:
   - Nicola Worthington <nicolaw@cpan.org>
 abstract: Retrieve list of filesystems and their properties
@@ -16,7 +16,7 @@ recommends:
 provides:
   Sys::Filesystem:
     file: lib/Sys/Filesystem.pm
-    version: 1.21
+    version: 1.22
   Sys::Filesystem::Aix:
     file: lib/Sys/Filesystem/Aix.pm
     version: 1.04
