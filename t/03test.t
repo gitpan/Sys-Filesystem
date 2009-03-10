@@ -2,7 +2,7 @@ use lib qw(./lib ../lib);
 use Test::More qw(no_plan);
 use Sys::Filesystem;
 
-use constant DEBUG => $ENV{DEBUG} ? 1 : 0;
+use constant DEBUG => $ENV{SYS_FILESYSTEM_DEBUG} ? 1 : 0;
 
 chdir 't' if -d 't';
 

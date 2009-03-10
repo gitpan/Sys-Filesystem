@@ -27,7 +27,7 @@ use FileHandle;
 use Carp qw(croak);
 
 use vars qw($VERSION);
-$VERSION = '1.04' || sprintf('%d', q$Revision: 572 $ =~ /(\d+)/g);
+$VERSION = '1.05';
 
 sub new {
 	ref(my $class = shift) && croak 'Class name required';
@@ -36,27 +36,118 @@ sub new {
 
 	$args{fstab} ||= '/etc/filesystems';
 
-	my @fstab_keys = qw(account boot check dev free mount nodename size type vfs vol log);
+	my @fstab_keys = qw(account boot check dev mount nodename size type vfs vol log);
 	my @special_fs = qw(swap procfs proc tmpfs nfs mntfs autofs);
+
+	my %curr_mountz = map {
+		my $path = $_ =~ m/^\s/ ? ( split )[1] : ( split )[2];
+		( $path => 1 );
+	}
+	qx( /usr/sbin/mount );
+
+	my %fs_info	= map
+	{
+		my ( $path, $device, $vfs, $nodename, $type, $size, $options, $mount, $account ) = split( m/:/, $_ );
+
+		( $path => [ $device, $vfs, $nodename, $type, $size, $options, $mount, $account ] )
+	}
+	grep { m/^#/ }
+	qx( /usr/sbin/lsfs -c );
+
+	foreach my $current_filesystem (keys %fs_info)
+	{
+		$self->{$current_filesystem}->{filesystem} = $current_filesystem;
+
+		my ( $device, $vfs, $nodename, $type, $size, $options, $mount, $account ) =
+			@{ $fs_info{$current_filesystem} };
+
+		$self->{ $current_filesystem }{ dev }      = $device;
+		$self->{ $current_filesystem }{ vfs }      = $vfs;
+		$self->{ $current_filesystem }{ options }  = $options;
+		$self->{ $current_filesystem }{ nodename } = $nodename;
+		$self->{ $current_filesystem }{ type }     = $type;
+		$self->{ $current_filesystem }{ size }     = $size;
+		$self->{ $current_filesystem }{ mount }    = $mount;
+		$self->{ $current_filesystem }{ account }  = $account;
+		if (defined($vfs) && grep(/^$vfs$/, @special_fs))
+		{
+			$self->{$current_filesystem}->{special} = 1;
+		}
+
+		# the filesystem is either currently mounted or is not,
+		# this does not need to be checked for each individual 
+		# attribute.
+
+		my $state = defined($curr_mountz{$current_filesystem}) ? 'mounted' : 'unmounted';
+		$self->{ $current_filesystem }{ $state }  = 1;
+	}
+
+	%fs_info = map
+	{
+		my ( $lvname, $type, $lps, $pps, $pvs, $lvstate, $path ) = split( m/\s+/, $_ );
+
+		( $path => [ $lvname, $type, $lps, $pps, $pvs, $lvstate ] )
+	}
+	grep { $_ !~ m/^\w+:$/ }
+	grep { $_ !~ m/^LV\sNAME\s+/ }
+	grep { $_ !~ m(N/A$) }
+	qx( /usr/sbin/lsvg -Ll `/usr/sbin/lsvg -Lo` );
+
+	foreach my $current_filesystem (keys %fs_info)
+	{
+		$self->{$current_filesystem}->{filesystem} = $current_filesystem;
+
+		my ( $lvname, $type, $lps, $pps, $pvs, $lvstate ) =
+			@{ $fs_info{$current_filesystem} };
+
+		$self->{ $current_filesystem }{ dev }      = $lvname;
+		$self->{ $current_filesystem }{ vfs }      = $type;
+		$self->{ $current_filesystem }{ LPs }      = $lps;
+		$self->{ $current_filesystem }{ PPs }      = $pps;
+		$self->{ $current_filesystem }{ PVs }      = $pvs;
+		$self->{ $current_filesystem }{ lvstate }  = $lvstate;
+		if (defined($type) && grep(/^$type$/, @special_fs))
+		{
+			$self->{$current_filesystem}->{special} = 1;
+		}
+
+		# the filesystem is either currently mounted or is not,
+		# this does not need to be checked for each individual 
+		# attribute.
+
+		my $state = defined($curr_mountz{$current_filesystem}) ? 'mounted' : 'unmounted';
+		$self->{ $current_filesystem }{ $state }  = 1;
+	}
 
 	# Read the fstab
 	my $fstab = new FileHandle;
 	if ($fstab->open($args{fstab})) {
 		my $current_filesystem = '*UNDEFINED*';
-		while (<$fstab>) {
-			next if (/^\s*#/ || /^\s*$/);
+		while (<$fstab>)
+		{
+			# skip comments and blank lines.
+
+			next if m{^ [*] }x || m{^ \s* $}x;
 
 			# Found a new filesystem group
 			if (/^\s*(.+?):\s*$/) {
 				$current_filesystem = $1;
 				$self->{$current_filesystem}->{filesystem} = $1;
 
+				# the filesystem is either currently mounted or is not,
+				# this does not need to be checked for each individual 
+				# attribute.
+
+				my $state = defined($curr_mountz{$current_filesystem}) ? 'mounted' : 'unmounted';
+				$self->{ $current_filesystem }{ $state }  = 1;
+
 			# This matches a filesystem attribute
 			} elsif (my ($key,$value) = $_ =~ /^\s*([a-z]{3,8})\s+=\s+"?(.+)"?\s*$/) {
-				$self->{$current_filesystem}->{$key} = $value;
-				$self->{$current_filesystem}->{unmounted} = -1; # Unknown mount state?
-				if ($key eq 'vfs') {
-					if (grep(/^$value$/, @special_fs)) {
+				unless( defined( $self->{$current_filesystem}->{$key} ) )
+				{
+					# do not overwrite already known data
+					$self->{$current_filesystem}->{$key} = $value;
+					if (($key eq 'vfs') && grep( /^$value$/, @special_fs ) ) {
 						$self->{$current_filesystem}->{special} = 1;
 					}
 				}
@@ -166,6 +257,66 @@ $Id: Aix.pm 572 2006-06-01 18:57:59Z nicolaw $
 Nicola Worthington <nicolaw@cpan.org>
 
 L<perlgirl.org.uk>
+
+=head2 Example /etc/filesystems
+
+
+	* @(#)filesystems @(#)29	1.22  src/bos/etc/filesystems/filesystems, cmdfs, bos530 9/8/00 13:57:45
+	* IBM_PROLOG_BEGIN_TAG 
+	* This is an automatically generated prolog. 
+	*  
+	* <snip>
+	*  
+	* This version of /etc/filesystems assumes that only the root file system
+	* is created and ready.  As new file systems are added, change the check,
+	* mount, free, log, vol and vfs entries for the appropriate stanza.
+
+	/:
+		dev       = /dev/hd4
+		vol       = "root"
+		mount     = automatic
+		check     = false
+		free      = true
+		vfs       = jfs2
+		log       = /dev/hd8
+		type      = bootfs
+
+	/proc:
+		dev       = /proc
+		vol       = "/proc"
+		mount     = true
+		check     = false
+		free      = false
+		vfs       = procfs
+
+	/scratch:
+		dev       = /dev/fslv02
+		vfs       = jfs2
+		log       = INLINE
+		mount     = true
+		account   = false
+
+
+=head2 Example /usr/sbin/mount output
+
+
+	  node       mounted        mounted over    vfs       date        options      
+	-------- ---------------  ---------------  ------ ------------ --------------- 
+			 /dev/hd4         /                jfs2   Mar 24 12:14 rw,log=/dev/hd8 
+			 /proc            /proc            procfs Mar 24 12:15 rw              
+			 /dev/fslv02      /scratch         jfs2   Mar 24 12:15 rw,log=INLINE   
+
+
+=head1 SEE ALSO
+
+=over4
+
+=item filesystems(4)
+
+Manpage includes all known options, describes the format
+and comment char's.
+
+=back
 
 =head1 COPYRIGHT
 

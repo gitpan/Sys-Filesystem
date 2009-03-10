@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Filesystem.pm 574 2006-06-01 19:02:44Z nicolaw $
+#   $Id$
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -26,9 +26,10 @@ use strict;
 use FileHandle;
 use Carp qw(croak cluck confess);
 
-use constant DEBUG => $ENV{DEBUG} ? 1 : 0;
+use constant DEBUG => $ENV{SYS_FILESYSTEM_DEBUG} ? 1 : 0;
+use constant SPECIAL => ('darwin' eq $^O) ? 0 : undef;
 use vars qw($VERSION $AUTOLOAD);
-$VERSION = '1.22' || sprintf('%d', q$Revision: 574 $ =~ /(\d+)/g);
+$VERSION = '1.23';
 
 sub new {
 	# Check we're being called correctly with a class name
@@ -108,7 +109,7 @@ sub filesystems {
 	# Invert logic for regular
 	if (exists $params->{regular}) {
 		delete $params->{regular};
-		$params->{special} = undef;
+		$params->{special} = SPECIAL;
 	}
 
 	my @filesystems = ();
@@ -152,7 +153,7 @@ sub special_filesystems {
 
 sub regular_filesystems {
 	my $self = shift;
-	return $self->filesystems(special => undef);
+	return $self->filesystems(special => SPECIAL);
 }
 
 sub DESTROY {}
@@ -478,7 +479,7 @@ L<perlport>, L<Solaris::DeviceTree>, L<Win32::DriveInfo>
 
 =head1 VERSION
 
-$Id: Filesystem.pm 574 2006-06-01 19:02:44Z nicolaw $
+$Id$
 
 =head1 AUTHOR
 

@@ -4,8 +4,8 @@ NAME
 SYNOPSIS
         use strict;
         use Sys::Filesystem ();
-        
-    # Method 1
+    
+        # Method 1
         my $fs = new Sys::Filesystem;
         my @filesystems = $fs->filesystems();
         for (@filesystems) {
@@ -15,16 +15,16 @@ SYNOPSIS
                               $fs->device($_)
                        );
         }
-        
-    # Method 2
+    
+        # Method 2
         my $weird_fs = Sys::Filesystem->new(
                               fstab => "/etc/weird/vfstab.conf",
                               mtab => "/etc/active_mounts",
                               xtab => "/etc/nfs/mounts"
                         );
         my @weird_filesystems = $weird_fs->filesystems();
-        
-    # Method 3 (nice but naughty)
+    
+        # Method 3 (nice but naughty)
         my @filesystems = Sys::Filesystem->filesystems();
 
 DESCRIPTION
@@ -218,7 +218,7 @@ SEE ALSO
     perlport, Solaris::DeviceTree, Win32::DriveInfo
 
 VERSION
-    $Id: Filesystem.pm 574 2006-06-01 19:02:44Z nicolaw $
+    $Id$
 
 AUTHOR
     Nicola Worthington <nicolaw@cpan.org>

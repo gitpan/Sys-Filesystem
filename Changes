@@ -1,4 +1,9 @@
-1.21
+1.23
+    Fixed Aix.pm (RT #34577), patches from LEMBARK, REHSACK
+    Fixed failing on OS X (RT #7958, RT #43681), patch from Dirk Langer
+    Taking Co-Maintainership (Jens Rehsack, CPAN Id: REHSACK)
+    Changing debug environment flag from DEBUG to SYS_FILESYSTEM_DEBUG
+1.22
 	Added CREDITS.
 	Fixed logic in Filesystem.pm:filesystems() where the inversion of
 	the 'regaular' and 'special' paramaters was not being handled

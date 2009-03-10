@@ -28,7 +28,7 @@ use Fcntl qw(:flock);
 use Carp qw(croak);
 
 use vars qw($VERSION);
-$VERSION = '1.13' || sprintf('%d', q$Revision: 562 $ =~ /(\d+)/g);
+$VERSION = '1.13';
 
 sub new {
 	ref(my $class = shift) && croak 'Class name required';

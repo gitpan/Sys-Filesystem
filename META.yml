@@ -1,8 +1,8 @@
 ---
 name: Sys-Filesystem
-version: 1.22
+version: 1.23
 author:
-  - Nicola Worthington <nicolaw@cpan.org>
+  - 'Nicola Worthington <nicolaw@cpan.org>'
 abstract: Retrieve list of filesystems and their properties
 license: open_source
 requires:
@@ -16,16 +16,16 @@ recommends:
 provides:
   Sys::Filesystem:
     file: lib/Sys/Filesystem.pm
-    version: 1.22
+    version: 1.23
   Sys::Filesystem::Aix:
     file: lib/Sys/Filesystem/Aix.pm
-    version: 1.04
+    version: 1.05
   Sys::Filesystem::Cygwin:
     file: lib/Sys/Filesystem/Cygwin.pm
     version: 1.07
   Sys::Filesystem::Darwin:
     file: lib/Sys/Filesystem/Darwin.pm
-    version: 0.2
+    version: 0.22
   Sys::Filesystem::Dummy:
     file: lib/Sys/Filesystem/Dummy.pm
     version: 1.06
@@ -44,4 +44,7 @@ provides:
   Sys::Filesystem::Unix:
     file: lib/Sys/Filesystem/Unix.pm
     version: 1.05
-generated_by: Module::Build version 0.2611
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

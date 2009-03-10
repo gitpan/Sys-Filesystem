@@ -27,7 +27,7 @@ use FileHandle;
 use Carp qw(croak);
 
 use vars qw($VERSION);
-$VERSION = '1.06' || sprintf('%d', q$Revision: 364 $ =~ /(\d+)/g);
+$VERSION = '1.06';
 
 sub new {
 	ref(my $class = shift) && croak 'Class name required';

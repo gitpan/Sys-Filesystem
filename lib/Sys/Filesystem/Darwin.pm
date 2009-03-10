@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Darwin.pm 364 2006-03-23 15:22:19Z nicolaw $
+#   $Id$
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -20,41 +20,67 @@
 ############################################################
 
 package Sys::Filesystem::Darwin;
+
 # vim:ts=4:sw=4:tw=78
 
 use strict;
+use warnings;
+
 use Carp qw(croak);
 
 use vars qw($VERSION);
-$VERSION = '0.2' || sprintf('%d', q$Revision: 364 $ =~ /(\d+)/g);
+$VERSION = '0.22';
 
-sub new {
-	my $class = shift;
-	my %args = @_;
-	my $self = { };
+sub new
+{
+    my $class = shift;
+    my %args  = @_;
+    my $self  = {};
 
-	$args{disktool} ||= '/usr/sbin/disktool';
+    $args{disktool} ||= '/usr/sbin/disktool';
+    $args{mount}    ||= '/sbin/mount';
 
-	local $/ = "\n";
-	my @fslist = `$args{disktool} -l`;
-	croak "Cannot execute $args{disktool}: $!\n" unless ($! == 0);
+    # don't use backticks, don't use the shell
+    my @fslist  = ();
+    my @mntlist = ();
+    open( my $dt_fh, '-|' ) or exec( $args{disktool}, '-l' ) or croak("Cannot execute $args{disktool}: $!\n");
+    @fslist = <$dt_fh>;
+    close($dt_fh);
+    open( my $m_fh, '-|' ) or exec( $args{mount} ) or croak("Cannot execute $args{mount}: $!\n");
+    @mntlist = <$m_fh>;
+    close($m_fh);
 
-	foreach (@fslist) {
-		# For mounted FTP servers, fsType and volName are empty on Mac OS X 10.3
-		# However, Mountpoint should not be empty.
-		next unless /Disk Appeared \('([^']+)',Mountpoint = '([^']+)', fsType = '([^']*)', volName = '([^']*)'\)/;
-		my ($device, $mount_point, $fstype, $name) = ($1, $2, $3, $4);
-	   
-		$self->{$mount_point}->{mounted} = 1;
-		$self->{$mount_point}->{special} = 0;
-		$self->{$mount_point}->{device} = $device;
-		$self->{$mount_point}->{mount_point} = $mount_point;
-		$self->{$mount_point}->{fs_vfstype} = $fstype;
-		$self->{$mount_point}->{label} = $name;
-	}
+    foreach (@fslist)
+    {
 
-	bless($self,$class);
-	return $self;
+        # For mounted FTP servers, fsType and volName are empty on Mac OS X 10.3
+        # However, Mountpoint should not be empty.
+        next unless (/Disk Appeared \('([^']+)',Mountpoint = '([^']+)', fsType = '([^']*)', volName = '([^']*)'\)/);
+        my ( $device, $mount_point, $fstype, $name ) = ( $1, $2, $3, $4 );
+
+        $self->{$mount_point}->{mounted}     = 1;
+        $self->{$mount_point}->{special}     = 0;
+        $self->{$mount_point}->{device}      = $device;
+        $self->{$mount_point}->{mount_point} = $mount_point;
+        $self->{$mount_point}->{fs_vfstype}  = $fstype;
+        $self->{$mount_point}->{fs_mntops}   = '';
+        $self->{$mount_point}->{label}       = $name;
+    }
+
+    # set the mount options
+    foreach (@mntlist)
+    {
+        next unless (/(.*) on (.*) \((.*)\)/);    # /dev/disk on / (hfs,...)
+        my ( $device, $mount_point, $mntopts ) = ( $1, $2, $3 );
+        if ( exists( $self->{$mount_point} ) )
+        {
+            $self->{$mount_point}->{fs_mntops} = $mntopts;
+        }
+
+    }
+
+    bless( $self, $class );
+    return $self;
 }
 
 1;
@@ -136,7 +162,7 @@ L<Sys::Filesystem>, L<diskutil>
 
 =head1 VERSION
 
-$Id: Darwin.pm 364 2006-03-23 15:22:19Z nicolaw $
+$Id$
 
 =head1 AUTHOR
 
@@ -151,6 +177,4 @@ This software is licensed under The Apache Software License, Version 2.0.
 L<http://www.apache.org/licenses/LICENSE-2.0>
 
 =cut
-
-
 
