@@ -1,9 +1,9 @@
 ############################################################
 #
-#   $Id: Unix.pm 364 2006-03-23 15:22:19Z nicolaw $
+#   $Id$
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
-#   Copyright 2004,2005,2006 Nicola Worthington
+#   Copyright 2009 Jens Rehsack
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 #
 ############################################################
 
-package Sys::Filesystem::Unix;
+package Sys::Filesystem::Netbsd;
 
 # vim:ts=4:sw=4:tw=78
 
@@ -28,7 +28,7 @@ use FileHandle;
 use Carp qw(croak);
 
 use vars qw($VERSION);
-$VERSION = '1.05';
+$VERSION = '1.24';
 
 sub new
 {
@@ -38,15 +38,24 @@ sub new
 
     # Defaults
     $args{fstab} ||= '/etc/fstab';
-    $args{mtab}  ||= '/etc/mtab';
-    $args{xtab}  ||= '/etc/lib/nfs/xtab';
 
     # Default fstab and mtab layout
     my @keys       = qw(fs_spec fs_file fs_vfstype fs_mntops fs_freq fs_passno);
-    my @special_fs = qw(swap proc);
+    my @special_fs = qw(swap procfs kernfs ptyfs tmpfs);
+
+    my %curr_mountz = map {
+        my ( $dev, $path ) = ( $_ =~ m|^([/\w]+)\s+on\s+([/\w]+)| ) && ( $1, $2 );
+        ( $path => $dev )
+    } qx( /sbin/mount );
+
+    my %curr_swapz;
+    foreach my $swap (qx(/sbin/swapctl -l))
+    {
+        $curr_swapz{$1} = 1 if ( $swap =~ m|^(/[/\w]+)\s+| );
+    }
 
     # Read the fstab
-    my $fstab = new FileHandle;
+    my $fstab = FileHandle->new();
     if ( $fstab->open( $args{fstab} ) )
     {
         while (<$fstab>)
@@ -57,35 +66,26 @@ sub new
             my @vals = split( /\s+/, $_ );
             $self->{ $vals[1] }->{mount_point} = $vals[1];
             $self->{ $vals[1] }->{device}      = $vals[0];
-            $self->{ $vals[1] }->{unmounted}   = 1;
-            $self->{ $vals[1] }->{special}     = 1 if grep( /^$vals[2]$/, @special_fs );
+            if ( defined( $curr_mountz{ $vals[1] } ) )
+            {
+                $self->{ $vals[1] }->{mounted} = 1;
+                $self->{ $vals[1] }->{device}  = $curr_mountz{ $vals[1] };
+            }
+            elsif ( defined( $curr_swapz{ $vals[0] } ) )
+            {
+                $self->{ $vals[1] }->{mounted} = 1;
+            }
+            else
+            {
+                $self->{ $vals[1] }->{unmounted} = 1;
+            }
+            $self->{ $vals[1] }->{special} = 1 if grep( /^$vals[2]$/, @special_fs );
             for ( my $i = 0; $i < @keys; $i++ )
             {
                 $self->{ $vals[1] }->{ $keys[$i] } = $vals[$i];
             }
         }
         $fstab->close;
-    }
-
-    # Read the mtab
-    my $mtab = new FileHandle;
-    if ( $mtab->open( $args{mtab} ) )
-    {
-        while (<$mtab>)
-        {
-            next if /^\s*#/;
-            next if /^\s*$/;
-            my @vals = split( /\s+/, $_ );
-            delete $self->{ $vals[1] }->{unmounted} if exists $self->{ $vals[1] }->{unmounted};
-            $self->{ $vals[1] }->{mounted}     = 1;
-            $self->{ $vals[1] }->{mount_point} = $vals[1];
-            $self->{ $vals[1] }->{device}      = $vals[0];
-            for ( my $i = 0; $i < @keys; $i++ )
-            {
-                $self->{ $vals[1] }->{ $keys[$i] } = $vals[$i];
-            }
-        }
-        $mtab->close;
     }
 
     bless( $self, $class );
@@ -98,7 +98,7 @@ sub new
 
 =head1 NAME
 
-Sys::Filesystem::Unix - Return generic Unix filesystem information to Sys::Filesystem
+Sys::Filesystem::Netbsd - Return NetBSD filesystem information to Sys::Filesystem
 
 =head1 SYNOPSIS
 
@@ -106,17 +106,17 @@ See L<Sys::Filesystem>.
 
 =head1 VERSION
 
-$Id: Unix.pm 364 2006-03-23 15:22:19Z nicolaw $
+$Id$
 
 =head1 AUTHOR
 
-Nicola Worthington <nicolaw@cpan.org>
+Jens Rehsack <rehsack@cpan.org>
 
-L<http://perlgirl.org.uk>
+L<http://www.rehsack.de/>
 
 =head1 COPYRIGHT
 
-Copyright 2004,2005,2006 Nicola Worthington.
+Copyright 2009 Jens Rehsack.
 
 This software is licensed under The Apache Software License, Version 2.0.
 
