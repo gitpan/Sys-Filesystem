@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id$
+#   $Id: Filesystem.pm 43 2009-10-30 20:00:31Z trevor $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -29,11 +29,12 @@ use 5.006;
 use strict;
 use FileHandle;
 use Carp qw(croak cluck confess);
+use Params::Util qw(_INSTANCE);
 
 use constant DEBUG => $ENV{SYS_FILESYSTEM_DEBUG} ? 1 : 0;
 use constant SPECIAL => ( 'darwin' eq $^O ) ? 0 : undef;
 use vars qw($VERSION $AUTOLOAD);
-$VERSION = '1.24';
+$VERSION = '1.25';
 
 sub new
 {
@@ -74,6 +75,10 @@ sub new
         }
     }
 
+    $self->{supported} =
+         ( ref( $self->{filesystems} ) ne 'Sys::Filesystem::Unix' )
+      && ( ref( $self->{filesystems} ) ne 'Sys::Filesystem::Dummy' );
+
     # Filesystem property aliases
     $self->{aliases} = {
                          device          => [qw(fs_spec dev)],
@@ -103,10 +108,10 @@ sub new
 sub filesystems
 {
     my $self = shift;
-    unless ( ref $self eq __PACKAGE__ || UNIVERSAL::isa( $self, __PACKAGE__ ) )
+    unless ( defined( _INSTANCE( $self, __PACKAGE__ ) ) )
     {
-        unshift @_, $self;
-        $self = new __PACKAGE__;
+        unshift @_, $self unless ( 0 == ( scalar(@_) % 2 ) );
+        $self = __PACKAGE__->new();
     }
 
     # Check we've got something sane passed
@@ -138,11 +143,24 @@ sub filesystems
     {
         for my $fs ( sort( keys( %{ $self->{filesystems} } ) ) )
         {
-            for my $requirement ( keys %{$params} )
+            for my $requirement ( keys( %{$params} ) )
             {
-                if ( ( defined $params->{$requirement} && exists $self->{filesystems}->{$fs}->{$requirement} )
-                     && $self->{filesystems}->{$fs}->{$requirement} eq $params->{$requirement}
-                     || ( !defined $params->{$requirement} && !exists $self->{filesystems}->{$fs}->{$requirement} ) )
+                my $fsreqname = $requirement;
+                if (   !exists( $self->{filesystems}->{$fs}->{$requirement} )
+                     && exists( $self->{aliases}->{$requirement} ) )
+                {
+                    foreach my $fsreqdef ( @{ $self->{aliases}->{$requirement} } )
+                    {
+                        if ( exists( $self->{filesystems}->{$fs}->{$fsreqdef} ) )
+                        {
+                            $fsreqname = $fsreqdef;
+                            last;
+                        }
+                    }
+                }
+                if ( ( defined $params->{$requirement} && exists $self->{filesystems}->{$fs}->{$fsreqname} )
+                     && $self->{filesystems}->{$fs}->{$fsreqname} eq $params->{$requirement}
+                     || ( !defined $params->{$requirement} && !exists $self->{filesystems}->{$fs}->{$fsreqname} ) )
                 {
                     push @filesystems, $fs;
                     last;
@@ -155,38 +173,38 @@ sub filesystems
     return @filesystems;
 }
 
+sub supported()
+{
+    return $_[0]->{supported};
+}
+
 sub mounted_filesystems
 {
-    my $self = shift;
-    return $self->filesystems( mounted => 1 );
+    return $_[0]->filesystems( mounted => 1 );
 }
 
 sub unmounted_filesystems
 {
-    my $self = shift;
-    return $self->filesystems( unmounted => 1 );
+    return $_[0]->filesystems( unmounted => 1 );
 }
 
 sub special_filesystems
 {
-    my $self = shift;
-    return $self->filesystems( special => 1 );
+    return $_[0]->filesystems( special => 1 );
 }
 
 sub regular_filesystems
 {
-    my $self = shift;
-    return $self->filesystems( special => SPECIAL );
+    return $_[0]->filesystems( special => SPECIAL );
 }
 
 sub DESTROY { }
 
 sub AUTOLOAD
 {
-    my $self = shift;
+    my ( $self, $fs ) = @_;
     my $type = ref($self) || croak "$self is not an object";
 
-    my $fs = shift;
     croak "No filesystem passed where expected" unless $fs;
 
     ( my $name = $AUTOLOAD ) =~ s/.*://;
@@ -228,7 +246,7 @@ sub AUTOLOAD
 sub TRACE
 {
     return unless DEBUG;
-    warn( shift() );
+    warn( $_[0] );
 }
 
 sub DUMP
@@ -254,9 +272,10 @@ Sys::Filesystem - Retrieve list of filesystems and their properties
     use Sys::Filesystem ();
     
     # Method 1
-    my $fs = new Sys::Filesystem;
+    my $fs = Sys::Filesystem->new();
     my @filesystems = $fs->filesystems();
-    for (@filesystems) {
+    for (@filesystems)
+    {
         printf("%s is a %s filesystem mounted on %s\n",
                           $fs->mount_point($_),
                           $fs->format($_),
@@ -266,9 +285,9 @@ Sys::Filesystem - Retrieve list of filesystems and their properties
     
     # Method 2
     my $weird_fs = Sys::Filesystem->new(
-                          fstab => "/etc/weird/vfstab.conf",
-                          mtab => "/etc/active_mounts",
-                          xtab => "/etc/nfs/mounts"
+                          fstab => '/etc/weird/vfstab.conf',
+                          mtab  => '/etc/active_mounts',
+                          xtab  => '/etc/nfs/mounts'
                     );
     my @weird_filesystems = $weird_fs->filesystems();
     
@@ -284,11 +303,16 @@ This module hopes to provide a consistant API to list all, mounted, unmounted
 and special filesystems on a system, and query as many properties as possible
 with common aliases wherever possible.
 
+=head1 INHERITANCE
+
+  Sys::Filesystem
+  ISA UNIVERSAL
+
 =head1 METHODS
 
 =over 4
 
-=item new()
+=item new
 
 Creates a new Sys::Filesystem object. new() accepts 3 optional key pair values
 to help or force where mount information is gathered from. These values are
@@ -317,6 +341,13 @@ therefore this option may be ignored on some systems.
 
 =back
 
+=item supported
+
+Returns true if the operating system is supported by Sys::Filesystem.
+Unsupported operating systems may get less information, e.g. the mount
+state couldn't determined or which file system type is special ins't
+known.
+
 =back
 
 =head2 Listing Filesystems
@@ -326,8 +357,11 @@ therefore this option may be ignored on some systems.
 =item filesystems()
 
 Returns a list of all filesystem. May accept an optional list of key pair
-values in order to filter/restrict the results which are returned. Valid
-values are as follows:
+values in order to filter/restrict the results which are returned. The
+restrictions are evaluated to match as much as possible, so asking for
+regular and special file system, you'll get all.
+
+Valid values are as follows:
 
 =over 4
 
@@ -520,21 +554,13 @@ L<perlport>, L<Solaris::DeviceTree>, L<Win32::DriveInfo>
 
 =head1 VERSION
 
-Sys::Filesystem 1.24
+$Id: Filesystem.pm 43 2009-10-30 20:00:31Z trevor $
 
 =head1 AUTHOR
 
-=over 4
+Nicola Worthington <nicolaw@cpan.org> - L<http://perlgirl.org.uk>
 
-=item Nicola Worthington <nicolaw@cpan.org>
-
-L<http://perlgirl.org.uk>
-
-=item Jens Rehsack <rehsack@cpan.org>
-
-L<http://www.rehsack.de/>
-
-=back
+Jens Rehsack <rehsack@cpan.org> - L<http://www.rehsack.de/>
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -543,6 +569,7 @@ See CREDITS in the distribution tarball.
 =head1 COPYRIGHT
 
 Copyright 2004,2005,2006 Nicola Worthington.
+
 Copyright 2008,2009 Jens Rehsack.
 
 This software is licensed under The Apache Software License, Version 2.0.

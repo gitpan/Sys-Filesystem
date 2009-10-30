@@ -1,5 +1,5 @@
 # vim:ts=4:sw=4:tw=78
-# $Id: Build.PL 149 2006-02-08 14:52:12Z nicolaw $
+# $Id: Build.PL 43 2009-10-30 20:00:31Z trevor $
 
 use 5.006;
 
@@ -17,8 +17,10 @@ $build = Module::Build->new(
     sign               => 0,
 
     requires => {
-                  'perl'       => '5.006',
-                  'Carp'       => 0,
+                  'perl'         => '5.006',
+                  'Carp'         => 0,
+                  'Params::Util' => '1.00',
+                  'IO'           => 0,
                   ( $^O eq /Win32/i ? ( 'Win32::DriveInfo' => 0, ) : () ),
                 },
 

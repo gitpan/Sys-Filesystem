@@ -1,8 +1,22 @@
+1.25
+	Fixed support for FreeBSD and generalize BSD support
+	Fixed support for AIX
+	Fixed aliased attribute support for Sys::Filesystem->filesystems
+	Fix "Sys::Filesystem->filesystems ()" and
+	  "Sys::Filesystem::filesystems" (reported by H.Merijn Brand)
+	  by using Params::Util
+	Add keyword "Id" to be used/expanded by svn
+	Explain how restrictions on method filesystem works in Sys::Filesystem
+	Add a version method to all fs plugins
+	Update documentation
+	Correct t/03test.t to use format instead of type (recommended)
+
 1.24
-        Fixed working on NetBSD (Jens Rehsack)
+        Added support for NetBSD (Jens Rehsack)
         Added support for HP-UX (H.Merijn Brand)
         Fixed POD a little
         Add a simple test to see whether it's working or not
+	Increased required perl version (suggested by H.Merijn Brand)
 1.23
         Fixed Aix.pm (RT #34577), patches from LEMBARK, REHSACK
         Fixed failing on OS X (RT #7958, RT #43681), patch from Dirk Langer

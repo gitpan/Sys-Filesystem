@@ -1,9 +1,10 @@
 ############################################################
 #
-#   $Id: Freebsd.pm 364 2006-03-23 15:22:19Z nicolaw $
+#   $Id: Freebsd.pm 43 2009-10-30 20:00:31Z trevor $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
+#   Copyright 2009           Jens Rehsack
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -24,77 +25,48 @@ package Sys::Filesystem::Freebsd;
 # vim:ts=4:sw=4:tw=78
 
 use strict;
-use FileHandle;
+use warnings;
+use vars qw(@ISA $VERSION);
+
+require Sys::Filesystem::Unix;
 use Carp qw(croak);
 
-use vars qw($VERSION);
-$VERSION = '1.05';
+$VERSION = '1.25';
+@ISA     = qw(Sys::Filesystem::Unix);
+
+sub version()
+{
+    return $VERSION;
+}
+
+my @keys = qw(fs_spec fs_file fs_vfstype fs_mntops fs_freq fs_passno);
+my %special_fs = (
+                   swap   => 1,
+                   proc   => 1,
+                   devpts => 1,
+                   tmpfs  => 1,
+                 );
+
+my $mount_rx = qr|^([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)|;
+my $swap_rx  = qr|^(/[/\w]+)\s+|;
 
 sub new
 {
     ref( my $class = shift ) && croak 'Class name required';
     my %args = @_;
-    my $self = {};
+    my $self = bless( {}, $class );
 
-    $args{fstab} ||= '/etc/fstab';
-    $args{mtab}  ||= '/etc/mtab';
-    $args{xtab}  ||= '/etc/lib/nfs/xtab';
+    $args{fstab} ||= $ENV{PATH_FSTAB} || '/etc/fstab';
 
-    my @keys       = qw(fs_spec fs_file fs_vfstype fs_mntops fs_freq fs_passno);
-    my @special_fs = qw(swap proc devpts tmpfs);
-
-    # Read the fstab
-    my $fstab = new FileHandle;
-    if ( $fstab->open( $args{fstab} ) )
-    {
-        while (<$fstab>)
-        {
-            next if ( /^\s*#/ || /^\s*$/ );
-            my @vals = split( /\s+/, $_ );
-            $self->{ $vals[1] }->{mount_point} = $vals[1];
-            $self->{ $vals[1] }->{device}      = $vals[0];
-            $self->{ $vals[1] }->{unmounted}   = 1;
-            $self->{ $vals[1] }->{special}     = 1 if grep( /^$vals[2]$/, @special_fs );
-            for ( my $i = 0; $i < @keys; $i++ )
-            {
-                $self->{ $vals[1] }->{ $keys[$i] } = $vals[$i];
-            }
-        }
-        $fstab->close;
-    }
-    else
+    my @mounts = map { $_ =~ s/[\cI]+/ /g; chomp; $_ } qx( /sbin/mount -p );
+    $self->readMounts( $mount_rx, [ 0, 1, 2 ], \@keys, \%special_fs, @mounts );
+    $self->readSwap( $swap_rx, qx( /sbin/swapctl -l ) );
+    unless ( $self->readFsTab( $args{fstab}, \@keys, [ 0, 1, 2 ], \%special_fs ) )
     {
         croak "Unable to open fstab file ($args{fstab})\n";
     }
 
-    # Read the mtab
-    my $mtab = new FileHandle;
-    if ( $mtab->open( $args{mtab} ) )
-    {
-        while (<$mtab>)
-        {
-            next if ( /^\s*#/ || /^\s*$/ );
-            my @vals = split( /\s+/, $_ );
-            delete $self->{ $vals[1] }->{unmounted} if exists $self->{ $vals[1] }->{unmounted};
-            $self->{ $vals[1] }->{mounted}     = 1;
-            $self->{ $vals[1] }->{mount_point} = $vals[1];
-            $self->{ $vals[1] }->{device}      = $vals[0];
-            $self->{ $vals[1] }->{special}     = 1 if grep( /^$vals[2]$/, qw(swap proc devpts tmpfs) );
-            for ( my $i = 0; $i < @keys; $i++ )
-            {
-                $self->{ $vals[1] }->{ $keys[$i] } = $vals[$i];
-            }
-        }
-        $mtab->close;
-    }
-    else
-    {
-        croak "Unable to open mtab file ($args{mtab})\n";
-    }
-
-    # Bless and return
-    bless( $self, $class );
-    return $self;
+    $self;
 }
 
 1;
@@ -127,7 +99,23 @@ Sys::Filesystem::Freebsd - Return Freebsd filesystem information to Sys::Filesys
 
 See L<Sys::Filesystem>.
 
+=head1 INHERITANCE
+
+  Sys::Filesystem::Freebsd
+  ISA Sys::Filesystem::Unix
+    ISA UNIVERSAL
+
 =head1 METHODS
+
+=over 4
+
+=item version ()
+
+Return the version of the (sub)module.
+
+=back
+
+=head1 ATTRIBUTES
 
 The following is a list of filesystem properties which may
 be queried as methods through the parent L<Sys::Filesystem> object.
@@ -136,7 +124,7 @@ be queried as methods through the parent L<Sys::Filesystem> object.
 
 =item fs_spec
 
-Dscribes the block special device or remote filesystem to be mounted.
+Describes the block special device or remote filesystem to be mounted.
 
 =item fs_file
 
@@ -170,17 +158,19 @@ L<Sys::Filesystem>, L<Sys::Filesystem::Unix>, L<fstab(5)>
 
 =head1 VERSION
 
-$Id: Freebsd.pm 364 2006-03-23 15:22:19Z nicolaw $
+$Id: Freebsd.pm 43 2009-10-30 20:00:31Z trevor $
 
 =head1 AUTHOR
 
-Nicola Worthington <nicolaw@cpan.org>
+Nicola Worthington <nicolaw@cpan.org> - L<http://perlgirl.org.uk>
 
-L<http://perlgirl.org.uk>
+Jens Rehsack <rehsack@cpan.org> - L<http://www.rehsack.de>
 
 =head1 COPYRIGHT
 
 Copyright 2004,2005,2006 Nicola Worthington.
+
+Copyright 2009 Jens Rehsack.
 
 This software is licensed under The Apache Software License, Version 2.0.
 

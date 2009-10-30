@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Mswin32.pm 368 2006-03-23 17:38:56Z nicolaw $
+#   $Id: Mswin32.pm 41 2009-10-30 19:23:22Z trevor $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -24,12 +24,16 @@ package Sys::Filesystem::Mswin32;
 # vim:ts=4:sw=4:tw=78
 
 use strict;
-use FileHandle;
 use Win32::DriveInfo;
 use Carp qw(croak);
 
 use vars qw($VERSION);
-$VERSION = '1.05';
+$VERSION = '1.25';
+
+sub version()
+{
+    return $VERSION;
+}
 
 sub new
 {
@@ -66,19 +70,54 @@ Sys::Filesystem::Mswin32 - Return Win32 filesystem information to Sys::Filesyste
 
 See L<Sys::Filesystem>.
 
+=head1 INHERITANCE
+
+  Sys::Filesystem::Mswin32
+  ISA UNIVERSAL
+
+=head1 METHODS
+
+=over 4
+
+=item version ()
+
+Return the version of the (sub)module.
+
+=back
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item mount_point
+
+Mount point.
+
+=item device
+
+Device of the file system.
+
+=item mounted
+
+True when mounted.
+
+=back
+
 =head1 VERSION
 
-$Id: Mswin32.pm 368 2006-03-23 17:38:56Z nicolaw $
+$Id: Mswin32.pm 41 2009-10-30 19:23:22Z trevor $
 
 =head1 AUTHOR
 
-Nicola Worthington <nicolaw@cpan.org>
+Nicola Worthington <nicolaw@cpan.org> - L<http://perlgirl.org.uk>
 
-L<http://perlgirl.org.uk>
+Jens Rehsack <rehsack@cpan.org> - L<http://www.rehsack.de/>
 
 =head1 COPYRIGHT
 
 Copyright 2004,2005,2006 Nicola Worthington.
+
+Copyright 2009 Jens Rehsack.
 
 This software is licensed under The Apache Software License, Version 2.0.
 

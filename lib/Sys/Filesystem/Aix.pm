@@ -1,9 +1,10 @@
 ############################################################
 #
-#   $Id: Aix.pm 572 2006-06-01 18:57:59Z nicolaw $
+#   $Id: Aix.pm 43 2009-10-30 20:00:31Z trevor $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
+#   Copyright 2008,2009      Jens Rehsack
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -24,22 +25,37 @@ package Sys::Filesystem::Aix;
 # vim:ts=4:sw=4:tw=78
 
 use strict;
-use FileHandle;
-use Carp qw(croak);
-
+use warnings;
 use vars qw($VERSION);
-$VERSION = '1.05';
+
+use Carp qw(croak);
+use IO::File;
+
+$VERSION = '1.25';
+
+sub version()
+{
+    return $VERSION;
+}
+
+my @fstab_keys = qw(account boot check dev mount nodename size type vfs vol log);
+my %special_fs = (
+                   swap   => 1,
+                   procfs => 1,
+                   proc   => 1,
+                   tmpfs  => 1,
+                   mntfs  => 1,
+                   autofs => 1,
+                 );
 
 sub new
 {
     ref( my $class = shift ) && croak 'Class name required';
     my %args = @_;
-    my $self = {};
+    my $self = bless( {}, $class );
 
     $args{fstab} ||= '/etc/filesystems';
-
-    my @fstab_keys = qw(account boot check dev mount nodename size type vfs vol log);
-    my @special_fs = qw(swap procfs proc tmpfs nfs mntfs autofs);
+    local $/ = "\n";
 
     my %curr_mountz = map {
         my $path = $_ =~ m/^\s/ ? (split)[1] : (split)[2];
@@ -51,7 +67,7 @@ sub new
 
         ( $path => [ $device, $vfs, $nodename, $type, $size, $options, $mount, $account ] )
       }
-      grep { m/^#/ } qx( /usr/sbin/lsfs -c );
+      grep { m/^[^#]/ } qx( /usr/sbin/lsfs -c );
 
     foreach my $current_filesystem ( keys %fs_info )
     {
@@ -59,25 +75,21 @@ sub new
 
         my ( $device, $vfs, $nodename, $type, $size, $options, $mount, $account ) = @{ $fs_info{$current_filesystem} };
 
-        $self->{$current_filesystem}{dev}      = $device;
-        $self->{$current_filesystem}{vfs}      = $vfs;
-        $self->{$current_filesystem}{options}  = $options;
-        $self->{$current_filesystem}{nodename} = $nodename;
-        $self->{$current_filesystem}{type}     = $type;
-        $self->{$current_filesystem}{size}     = $size;
-        $self->{$current_filesystem}{mount}    = $mount;
-        $self->{$current_filesystem}{account}  = $account;
-        if ( defined($vfs) && grep( /^$vfs$/, @special_fs ) )
-        {
-            $self->{$current_filesystem}->{special} = 1;
-        }
+        $self->{$current_filesystem}->{dev}      = $device;
+        $self->{$current_filesystem}->{vfs}      = $vfs;
+        $self->{$current_filesystem}->{options}  = $options;
+        $self->{$current_filesystem}->{nodename} = $nodename;
+        $self->{$current_filesystem}->{type}     = $type;
+        $self->{$current_filesystem}->{size}     = $size;
+        $self->{$current_filesystem}->{mount}    = $mount;
+        $self->{$current_filesystem}->{account}  = $account;
+        $self->{$current_filesystem}->{special}  = 1 if ( defined($vfs) && defined( $special_fs{$vfs} ) );
 
         # the filesystem is either currently mounted or is not,
         # this does not need to be checked for each individual
         # attribute.
-
         my $state = defined( $curr_mountz{$current_filesystem} ) ? 'mounted' : 'unmounted';
-        $self->{$current_filesystem}{$state} = 1;
+        $self->{$current_filesystem}->{$state} = 1;
     }
 
     %fs_info = map {
@@ -95,35 +107,29 @@ sub new
 
         my ( $lvname, $type, $lps, $pps, $pvs, $lvstate ) = @{ $fs_info{$current_filesystem} };
 
-        $self->{$current_filesystem}{dev}     = $lvname;
-        $self->{$current_filesystem}{vfs}     = $type;
-        $self->{$current_filesystem}{LPs}     = $lps;
-        $self->{$current_filesystem}{PPs}     = $pps;
-        $self->{$current_filesystem}{PVs}     = $pvs;
-        $self->{$current_filesystem}{lvstate} = $lvstate;
-        if ( defined($type) && grep( /^$type$/, @special_fs ) )
-        {
-            $self->{$current_filesystem}->{special} = 1;
-        }
+        $self->{$current_filesystem}->{dev}     = $lvname;
+        $self->{$current_filesystem}->{vfs}     = $type;
+        $self->{$current_filesystem}->{LPs}     = $lps;
+        $self->{$current_filesystem}->{PPs}     = $pps;
+        $self->{$current_filesystem}->{PVs}     = $pvs;
+        $self->{$current_filesystem}->{lvstate} = $lvstate;
+        $self->{$current_filesystem}->{special} = 1 if ( defined($type) && defined( $special_fs{$type} ) );
 
         # the filesystem is either currently mounted or is not,
         # this does not need to be checked for each individual
         # attribute.
-
         my $state = defined( $curr_mountz{$current_filesystem} ) ? 'mounted' : 'unmounted';
-        $self->{$current_filesystem}{$state} = 1;
+        $self->{$current_filesystem}->{$state} = 1;
     }
 
     # Read the fstab
-    my $fstab = new FileHandle;
-    if ( $fstab->open( $args{fstab} ) )
+    if ( my $fstab = IO::File->new( $args{fstab}, 'r' ) )
     {
         my $current_filesystem = '*UNDEFINED*';
         while (<$fstab>)
         {
 
             # skip comments and blank lines.
-
             next if m{^ [*] }x || m{^ \s* $}x;
 
             # Found a new filesystem group
@@ -135,7 +141,6 @@ sub new
                 # the filesystem is either currently mounted or is not,
                 # this does not need to be checked for each individual
                 # attribute.
-
                 my $state = defined( $curr_mountz{$current_filesystem} ) ? 'mounted' : 'unmounted';
                 $self->{$current_filesystem}{$state} = 1;
 
@@ -148,22 +153,21 @@ sub new
 
                     # do not overwrite already known data
                     $self->{$current_filesystem}->{$key} = $value;
-                    if ( ( $key eq 'vfs' ) && grep( /^$value$/, @special_fs ) )
+                    if ( ( $key eq 'vfs' ) && defined( $special_fs{$value} ) )
                     {
                         $self->{$current_filesystem}->{special} = 1;
                     }
                 }
             }
         }
-        $fstab->close;
+        $fstab->close();
     }
     else
     {
         croak "Unable to open fstab file ($args{fstab})\n";
     }
 
-    bless( $self, $class );
-    return $self;
+    $self;
 }
 
 1;
@@ -178,7 +182,22 @@ Sys::Filesystem::Aix - Return AIX filesystem information to Sys::Filesystem
 
 See L<Sys::Filesystem>.
 
+=head1 INHERITANCE
+
+  Sys::Filesystem::Aix
+  ISA UNIVERSAL
+
 =head1 METHODS
+
+=over 4
+
+=item version ()
+
+Return the version of the (sub)module.
+
+=back
+
+=head1 ATTRIBUTES
 
 The following is a list of filesystem properties which may
 be queried as methods through the parent L<Sys::Filesystem> object.
@@ -252,16 +271,6 @@ system is modified. This is only valid for journaled filesystems.
 
 L<Sys::Filesystem>
 
-=head1 VERSION
-
-$Id: Aix.pm 572 2006-06-01 18:57:59Z nicolaw $
-
-=head1 AUTHOR
-
-Nicola Worthington <nicolaw@cpan.org>
-
-L<perlgirl.org.uk>
-
 =head2 Example /etc/filesystems
 
 
@@ -311,20 +320,26 @@ L<perlgirl.org.uk>
 			 /dev/fslv02      /scratch         jfs2   Mar 24 12:15 rw,log=INLINE   
 
 
-=head1 SEE ALSO
-
-=over 4
-
-=item filesystems(4)
+=head2 filesystems(4)
 
 Manpage includes all known options, describes the format
 and comment char's.
 
-=back
+=head1 VERSION
+
+$Id: Aix.pm 43 2009-10-30 20:00:31Z trevor $
+
+=head1 AUTHOR
+
+Nicola Worthington <nicolaw@cpan.org> - L<http://perlgirl.org.uk>
+
+Jens Rehsack <rehsack@cpan.org> - L<http://www.rehsack.de/>
 
 =head1 COPYRIGHT
 
 Copyright 2004,2005,2006 Nicola Worthington.
+
+Copyright 2008,2009 Jens Rehsack.
 
 This software is licensed under The Apache Software License, Version 2.0.
 
