@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Unix.pm 43 2009-10-30 20:00:31Z trevor $
+#   $Id: Unix.pm 61 2010-02-12 14:36:11Z trevor $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -30,7 +30,7 @@ use Fcntl qw(:flock);
 use IO::File;
 
 use vars qw($VERSION);
-$VERSION = '1.25';
+$VERSION = '1.26';
 
 sub version()
 {
@@ -344,7 +344,7 @@ Array containing the lines to parse.
 
 =head1 VERSION
 
-$Id: Unix.pm 43 2009-10-30 20:00:31Z trevor $
+$Id: Unix.pm 61 2010-02-12 14:36:11Z trevor $
 
 =head1 AUTHOR
 

@@ -205,7 +205,7 @@ OS SPECIFIC HELPER MODULES
     First written by Christian Renz <crenz@web42.com>.
 
   Win32
-    Provides "mount_point" and "device" of mounted filesystems on Windows.
+    Provides `mount_point' and `device' of mounted filesystems on Windows.
 
   AIX
     Please be aware that the AIX /etc/filesystems file has both a "type" and
@@ -235,12 +235,12 @@ SEE ALSO
     perlport, Solaris::DeviceTree, Win32::DriveInfo
 
 VERSION
-    $Id: Filesystem.pm 43 2009-10-30 20:00:31Z trevor $
+    $Id: Filesystem.pm 61 2010-02-12 14:36:11Z trevor $
 
 AUTHOR
-    Nicola Worthington <nicolaw@cpan.org> - <http://perlgirl.org.uk>
+    Nicola Worthington <nicolaw@cpan.org> - http://perlgirl.org.uk
 
-    Jens Rehsack <rehsack@cpan.org> - <http://www.rehsack.de/>
+    Jens Rehsack <rehsack@cpan.org> - http://www.rehsack.de/
 
 ACKNOWLEDGEMENTS
     See CREDITS in the distribution tarball.
@@ -253,5 +253,5 @@ COPYRIGHT
     This software is licensed under The Apache Software License, Version
     2.0.
 
-    <http://www.apache.org/licenses/LICENSE-2.0>
+    http://www.apache.org/licenses/LICENSE-2.0
 

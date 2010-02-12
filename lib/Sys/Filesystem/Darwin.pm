@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Darwin.pm 43 2009-10-30 20:00:31Z trevor $
+#   $Id: Darwin.pm 61 2010-02-12 14:36:11Z trevor $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -34,7 +34,7 @@ require Sys::Filesystem::Unix;
 
 use Carp qw(croak);
 
-$VERSION = '1.25';
+$VERSION = '1.26';
 @ISA     = qw(Sys::Filesystem::Unix);
 
 sub version()
@@ -46,14 +46,16 @@ my @dt_keys    = qw(fs_spec fs_file fs_vfstype fs_name);
 my @mount_keys = qw(fs_spec fs_file fs_mntops);
 my %special_fs = qw();
 
-my $dt_rx = qr/Disk Appeared \('([^']+)',Mountpoint = '([^']+)', fsType = '([^']*)', volName = '([^']*)'\)/;
+my $dt_rx = qr/Disk\sAppeared\s+\('([^']+)',\s*
+               Mountpoint\s*=\s*'([^']+)',\s*
+               fsType\s*=\s*'([^']*)',\s*
+               volName\s*=\s*'([^']*)'\)/x;
 my $mount_rx = qr/(.*) on (.*) \((.*)\)/;    # /dev/disk on / (hfs,...)
 
 sub new
 {
-    my $class = shift;
-    my %args  = @_;
-    my $self  = bless( {}, $class );
+    my ( $class, %args ) = @_;
+    my $self = bless( {}, $class );
 
     $args{disktool} ||= '/usr/sbin/disktool';
     $args{mount}    ||= '/sbin/mount';
@@ -197,7 +199,7 @@ L<Sys::Filesystem>, L<diskutil>
 
 =head1 VERSION
 
-$Id: Darwin.pm 43 2009-10-30 20:00:31Z trevor $
+$Id: Darwin.pm 61 2010-02-12 14:36:11Z trevor $
 
 =head1 AUTHOR
 

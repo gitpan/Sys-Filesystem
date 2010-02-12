@@ -1,5 +1,5 @@
 # vim:ts=4:sw=4:tw=78
-# $Id: Build.PL 43 2009-10-30 20:00:31Z trevor $
+# $Id: Build.PL 47 2009-11-29 13:50:03Z trevor $
 
 use 5.006;
 
@@ -20,12 +20,12 @@ $build = Module::Build->new(
                   'perl'         => '5.006',
                   'Carp'         => 0,
                   'Params::Util' => '1.00',
+                  'Module::Pluggable' => '3.9',
                   'IO'           => 0,
                   ( $^O eq /Win32/i ? ( 'Win32::DriveInfo' => 0, ) : () ),
                 },
 
     recommends => {
-                    'Test'                => 0,
                     'Test::More'          => 0,
                     'Test::Pod'           => 0,
                     'Test::Pod::Coverage' => 0,

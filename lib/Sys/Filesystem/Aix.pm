@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Aix.pm 43 2009-10-30 20:00:31Z trevor $
+#   $Id: Aix.pm 61 2010-02-12 14:36:11Z trevor $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -31,7 +31,7 @@ use vars qw($VERSION);
 use Carp qw(croak);
 use IO::File;
 
-$VERSION = '1.25';
+$VERSION = '1.26';
 
 sub version()
 {
@@ -327,7 +327,7 @@ and comment char's.
 
 =head1 VERSION
 
-$Id: Aix.pm 43 2009-10-30 20:00:31Z trevor $
+$Id: Aix.pm 61 2010-02-12 14:36:11Z trevor $
 
 =head1 AUTHOR
 

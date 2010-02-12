@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Linux.pm 43 2009-10-30 20:00:31Z trevor $
+#   $Id: Linux.pm 61 2010-02-12 14:36:11Z trevor $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -31,7 +31,7 @@ use Carp qw(croak);
 require IO::File;
 require Sys::Filesystem::Unix;
 
-$VERSION = '1.25';
+$VERSION = '1.26';
 @ISA     = qw(Sys::Filesystem::Unix);
 
 sub version()
@@ -42,10 +42,15 @@ sub version()
 # Default fstab and mtab layout
 my @keys = qw(fs_spec fs_file fs_vfstype fs_mntops fs_freq fs_passno);
 my %special_fs = (
-                   swap   => 1,
-                   proc   => 1,
-                   devpts => 1,
-                   tmpfs  => 1,
+                   swap       => 1,
+                   proc       => 1,
+                   devpts     => 1,
+                   tmpfs      => 1,
+                   sysfs      => 1,
+                   procbususb => 1,
+                   udev       => 1,
+                   devpts     => 1,
+                   nfsd       => 1,
                  );
 
 sub new
@@ -56,8 +61,7 @@ sub new
 
     # Defaults
     $args{fstab} ||= '/etc/fstab';
-    $args{mtab}  ||= '/etc/mtab';
-
+    $args{mtab} ||= -r '/proc/self/mounts' ? '/proc/self/mounts' : '/etc/mtab';
     #$args{xtab}  ||= '/etc/lib/nfs/xtab';
 
     local $/ = "\n";
@@ -210,7 +214,7 @@ L<Sys::Filesystem>, L<Sys::Filesystem::Unix>, L<fstab(5)>
 
 =head1 VERSION
 
-$Id: Linux.pm 43 2009-10-30 20:00:31Z trevor $
+$Id: Linux.pm 61 2010-02-12 14:36:11Z trevor $
 
 =head1 AUTHOR
 

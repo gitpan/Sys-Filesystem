@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Solaris.pm 43 2009-10-30 20:00:31Z trevor $
+#   $Id: Solaris.pm 61 2010-02-12 14:36:11Z trevor $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -29,9 +29,10 @@ use warnings;
 use vars qw($VERSION @ISA);
 
 use Carp qw(croak);
+use Data::Dumper;
 require Sys::Filesystem::Unix;
 
-$VERSION = '1.25';
+$VERSION = '1.26';
 @ISA     = qw(Sys::Filesystem::Unix);
 
 sub version()
@@ -70,11 +71,13 @@ sub new
     {
         croak "Unable to open fstab file ($args{fstab})\n";
     }
+    print( STDERR Dumper( \$self ) );
 
     unless ( $self->readMntTab( $args{mtab}, \@mtab_keys, [ 0, 1, 2 ], \%special_fs ) )
     {
         croak "Unable to open mtab file ($args{mtab})\n";
     }
+    print( STDERR Dumper( \$self ) );
 
     $self;
 }
@@ -155,7 +158,7 @@ L<Solaris::DeviceTree>
 
 =head1 VERSION
 
-$Id: Solaris.pm 43 2009-10-30 20:00:31Z trevor $
+$Id: Solaris.pm 61 2010-02-12 14:36:11Z trevor $
 
 =head1 AUTHOR
 
