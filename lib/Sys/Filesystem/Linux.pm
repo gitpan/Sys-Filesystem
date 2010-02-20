@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Linux.pm 61 2010-02-12 14:36:11Z trevor $
+#   $Id: Linux.pm 69 2010-02-19 12:59:04Z trevor $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -31,7 +31,7 @@ use Carp qw(croak);
 require IO::File;
 require Sys::Filesystem::Unix;
 
-$VERSION = '1.26';
+$VERSION = '1.27';
 @ISA     = qw(Sys::Filesystem::Unix);
 
 sub version()
@@ -214,7 +214,7 @@ L<Sys::Filesystem>, L<Sys::Filesystem::Unix>, L<fstab(5)>
 
 =head1 VERSION
 
-$Id: Linux.pm 61 2010-02-12 14:36:11Z trevor $
+$Id: Linux.pm 69 2010-02-19 12:59:04Z trevor $
 
 =head1 AUTHOR
 

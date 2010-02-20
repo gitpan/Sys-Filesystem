@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Unix.pm 61 2010-02-12 14:36:11Z trevor $
+#   $Id: Unix.pm 75 2010-02-19 13:31:04Z trevor $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -30,7 +30,7 @@ use Fcntl qw(:flock);
 use IO::File;
 
 use vars qw($VERSION);
-$VERSION = '1.26';
+$VERSION = '1.27';
 
 sub version()
 {
@@ -56,8 +56,8 @@ sub new
 
     # $args{xtab}  ||= '/etc/lib/nfs/xtab';
 
-    $self->readFsTab( $args{fstab}, \@keys, \%special_fs );
-    $self->readMntTab( $args{mtab}, \@keys, \%special_fs );
+    $self->readFsTab( $args{fstab}, \@keys, [ 0, 1, 2 ], \%special_fs );
+    $self->readMntTab( $args{mtab}, \@keys, [ 0, 1, 2 ], \%special_fs );
 
     $self;
 }
@@ -97,7 +97,7 @@ sub readFsTab($\@\@\%)
 
             for ( my $i = 0; $i < @{$fstabKeys}; ++$i )
             {
-                $self->{ $vals[ $pridx->[1] ] }->{ $fstabKeys->[$i] } = $vals[$i];
+                $self->{ $vals[ $pridx->[1] ] }->{ $fstabKeys->[$i] } = defined( $vals[$i] ) ? $vals[$i] : '';
             }
         }
         $fstab->close();
@@ -146,7 +146,7 @@ sub readMntTab($\@\@\%)
 
             for ( my $i = 0; $i < @{$mnttabKeys}; ++$i )
             {
-                $self->{ $vals[ $pridx->[1] ] }->{ $mnttabKeys->[$i] } = $vals[$i];
+                $self->{ $vals[ $pridx->[1] ] }->{ $mnttabKeys->[$i] } = defined( $vals[$i] ) ? $vals[$i] : '';
             }
         }
         $mtab->close();
@@ -176,17 +176,16 @@ sub readMounts
             {
                 my $vfs_type;
                 $vfs_type = $self->{ $vals[ $pridx->[1] ] }->{fs_vfstype} = $vals[ $pridx->[2] ];
-                $self->{ $vals[ $pridx->[1] ] }->{special} = 1 if ( defined( $special->{vfs_types} ) );
+                $self->{ $vals[ $pridx->[1] ] }->{special} = 1 if ( defined( $special->{$vfs_type} ) );
             }
-            else
+            elsif ( !defined( $self->{ $vals[ $pridx->[1] ] }->{special} ) )
             {
-                $self->{ $vals[ $pridx->[1] ] }->{special} = 0
-                  unless ( defined( $self->{ $vals[ $pridx->[1] ] }->{special} ) );
+                $self->{ $vals[ $pridx->[1] ] }->{special} = 0;
             }
 
             for ( my $i = 0; $i < @{$keys}; ++$i )
             {
-                $self->{ $vals[ $pridx->[1] ] }->{ $keys->[$i] } = $vals[$i];
+                $self->{ $vals[ $pridx->[1] ] }->{ $keys->[$i] } = defined( $vals[$i] ) ? $vals[$i] : '';
             }
         }
     }
@@ -344,7 +343,7 @@ Array containing the lines to parse.
 
 =head1 VERSION
 
-$Id: Unix.pm 61 2010-02-12 14:36:11Z trevor $
+$Id: Unix.pm 75 2010-02-19 13:31:04Z trevor $
 
 =head1 AUTHOR
 

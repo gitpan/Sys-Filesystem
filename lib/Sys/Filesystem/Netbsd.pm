@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Netbsd.pm 61 2010-02-12 14:36:11Z trevor $
+#   $Id: Netbsd.pm 75 2010-02-19 13:31:04Z trevor $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2009 Jens Rehsack
@@ -29,7 +29,7 @@ use vars qw(@ISA $VERSION);
 require Sys::Filesystem::Unix;
 use Carp qw(croak);
 
-$VERSION = '1.26';
+$VERSION = '1.27';
 @ISA     = qw(Sys::Filesystem::Unix);
 
 sub version()
@@ -60,7 +60,7 @@ sub new
     $args{fstab} ||= '/etc/fstab';
 
     my @mounts = qx( /sbin/mount );
-    $self->readMounts( $mount_rx, [ 0, 1, 2 ], [qw(fs_spec fs_file fs_vfstype)], \%special_fs, @mounts );
+    $self->readMounts( $mount_rx, [ 0, 1, 2 ], [qw(fs_spec fs_file fs_vfstype fs_mntops)], \%special_fs, @mounts );
     $self->readSwap( $swap_rx, qx( /sbin/swapctl -l ) );
     unless ( $self->readFsTab( $args{fstab}, \@keys, [ 0, 1, 2 ], \%special_fs ) )
     {
@@ -137,7 +137,7 @@ checks are done at reboot time.
 
 =head1 VERSION
 
-$Id: Netbsd.pm 61 2010-02-12 14:36:11Z trevor $
+$Id: Netbsd.pm 75 2010-02-19 13:31:04Z trevor $
 
 =head1 AUTHOR
 

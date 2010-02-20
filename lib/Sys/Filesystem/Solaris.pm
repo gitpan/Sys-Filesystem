@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Solaris.pm 61 2010-02-12 14:36:11Z trevor $
+#   $Id: Solaris.pm 69 2010-02-19 12:59:04Z trevor $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -32,7 +32,7 @@ use Carp qw(croak);
 use Data::Dumper;
 require Sys::Filesystem::Unix;
 
-$VERSION = '1.26';
+$VERSION = '1.27';
 @ISA     = qw(Sys::Filesystem::Unix);
 
 sub version()
@@ -158,7 +158,7 @@ L<Solaris::DeviceTree>
 
 =head1 VERSION
 
-$Id: Solaris.pm 61 2010-02-12 14:36:11Z trevor $
+$Id: Solaris.pm 69 2010-02-19 12:59:04Z trevor $
 
 =head1 AUTHOR
 

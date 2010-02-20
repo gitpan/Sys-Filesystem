@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Darwin.pm 61 2010-02-12 14:36:11Z trevor $
+#   $Id: Darwin.pm 73 2010-02-19 13:14:33Z trevor $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -34,7 +34,7 @@ require Sys::Filesystem::Unix;
 
 use Carp qw(croak);
 
-$VERSION = '1.26';
+$VERSION = '1.27';
 @ISA     = qw(Sys::Filesystem::Unix);
 
 sub version()
@@ -44,13 +44,16 @@ sub version()
 
 my @dt_keys    = qw(fs_spec fs_file fs_vfstype fs_name);
 my @mount_keys = qw(fs_spec fs_file fs_mntops);
-my %special_fs = qw();
+my %special_fs = (
+                   devfs  => 1,
+                   autofs => 1,
+                 );
 
 my $dt_rx = qr/Disk\sAppeared\s+\('([^']+)',\s*
                Mountpoint\s*=\s*'([^']+)',\s*
                fsType\s*=\s*'([^']*)',\s*
                volName\s*=\s*'([^']*)'\)/x;
-my $mount_rx = qr/(.*) on (.*) \((.*)\)/;    # /dev/disk on / (hfs,...)
+my $mount_rx = qr/(.*) on (.*) \((\w+),?.*\)/;    # /dev/disk on / (hfs,...)
 
 sub new
 {
@@ -199,7 +202,7 @@ L<Sys::Filesystem>, L<diskutil>
 
 =head1 VERSION
 
-$Id: Darwin.pm 61 2010-02-12 14:36:11Z trevor $
+$Id: Darwin.pm 73 2010-02-19 13:14:33Z trevor $
 
 =head1 AUTHOR
 
