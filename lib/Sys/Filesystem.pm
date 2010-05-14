@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Filesystem.pm 68 2010-02-19 12:58:40Z trevor $
+#   $Id: Filesystem.pm 141 2010-05-14 16:04:41Z trevor $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -45,7 +45,7 @@ use constant DEBUG => $ENV{SYS_FILESYSTEM_DEBUG} ? 1 : 0;
 #use constant SPECIAL => ( 'darwin' eq $^O ) ? 0 : undef;
 use constant SPECIAL => undef;
 
-$VERSION = '1.27';
+$VERSION = '1.28';
 
 my ( $FsPlugin, $Supported );
 
@@ -121,18 +121,22 @@ sub filesystems
     }
 
     # Check we've got something sane passed
-    croak 'Odd number of elements passed when even number was expected' if @_ % 2;
+    croak 'Odd number of elements passed when even number was expected' if ( @_ % 2 );
     my $params = {@_};
     for my $param ( keys %{$params} )
     {
         croak "Illegal paramater '$param' passed to filesystems() method"
-          unless grep( /^$param$/, qw(mounted unmounted special device regular) );
+          unless grep( m/^$param$/, qw(mounted unmounted special device regular) );
     }
 
     # Invert logic for regular
     if ( exists $params->{regular} )
     {
         delete $params->{regular};
+        if ( exists( $params->{special} ) )
+        {
+            carp("Both parameters specified, 'special' and 'regular', which are mutually exclusive");
+        }
         $params->{special} = SPECIAL;
     }
 
@@ -164,11 +168,15 @@ sub filesystems
                         }
                     }
                 }
-                if ( ( defined $params->{$requirement} && exists $self->{filesystems}->{$fs}->{$fsreqname} )
-                     && $self->{filesystems}->{$fs}->{$fsreqname} eq $params->{$requirement}
-                     || ( !defined $params->{$requirement} && !exists $self->{filesystems}->{$fs}->{$fsreqname} ) )
+                if (
+                     (
+                          ( defined( $params->{$requirement} ) && exists( $self->{filesystems}->{$fs}->{$fsreqname} ) )
+                       && ( $self->{filesystems}->{$fs}->{$fsreqname} eq $params->{$requirement} )
+                     )
+                     || ( !defined( $params->{$requirement} ) && !exists( $self->{filesystems}->{$fs}->{$fsreqname} ) )
+                   )
                 {
-                    push @filesystems, $fs;
+                    push( @filesystems, $fs );
                     last;
                 }
             }
@@ -358,7 +366,16 @@ known.
 Returns a list of all filesystem. May accept an optional list of key pair
 values in order to filter/restrict the results which are returned. The
 restrictions are evaluated to match as much as possible, so asking for
-regular and special file system, you'll get all.
+regular and special file system (or mounted and special file systems),
+you'll get all.
+
+For better understanding, please imagine the parameters like:
+
+  @fslist = $fs->filesystems( mounted => 1, special => 1 );
+  # results similar as
+  SELECT mountpoint FROM filesystems WHERE mounted = 1 OR special = 1
+
+If you need other selection choices, please take a look at L<DBD::Sys>.
 
 Valid values are as follows:
 
@@ -395,12 +412,16 @@ the documentation of the operating system specific helper module for
 further information about your system. (Sys::Filesystem::Linux for Linux
 or Sys::Filesystem::Solaris for Solaris etc).
 
+This parameter is mutually exclusive to C<regular>.
+
 The special_filesystems() method is an alias for this syntax.
 
-=item regular => undef
+=item regular => 1
 
 Returns only fileystems which are not regarded as special. (Normal
 filesystems).
+
+This parameter is mutually exclusive to C<special>.
 
 The regular_filesystems() method is an alias for this syntax.
 
@@ -544,8 +565,37 @@ Sys::Filesystem requires Perl >= 5.6 to run.
 
 =head1 TODO
 
-Add support for Windows, FreeBSD, HP-UX and Tru64. Please contact me
-if you would like to provide code for these operating systems.
+Add support for Tru64, MidnightBSD, Haiku, Minix, DragonflyBSD and OpenBSD.
+Please contact me if you would like to provide code for these operating
+systems.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Sys::Filesystem
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Sys-Filesystem>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Sys-Filesystem>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/s/Sys-Filesystem>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Sys-Filesystem/>
+
+=back
 
 =head1 SEE ALSO
 
@@ -553,7 +603,7 @@ L<perlport>, L<Solaris::DeviceTree>, L<Win32::DriveInfo>
 
 =head1 VERSION
 
-$Id: Filesystem.pm 68 2010-02-19 12:58:40Z trevor $
+$Id: Filesystem.pm 141 2010-05-14 16:04:41Z trevor $
 
 =head1 AUTHOR
 
@@ -569,7 +619,7 @@ See CREDITS in the distribution tarball.
 
 Copyright 2004,2005,2006 Nicola Worthington.
 
-Copyright 2008,2009 Jens Rehsack.
+Copyright 2008-2010 Jens Rehsack.
 
 This software is licensed under The Apache Software License, Version 2.0.
 

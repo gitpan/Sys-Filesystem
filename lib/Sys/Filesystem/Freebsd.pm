@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Freebsd.pm 69 2010-02-19 12:59:04Z trevor $
+#   $Id: Freebsd.pm 128 2010-05-12 13:16:44Z trevor $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -31,7 +31,7 @@ use vars qw(@ISA $VERSION);
 require Sys::Filesystem::Unix;
 use Carp qw(croak);
 
-$VERSION = '1.27';
+$VERSION = '1.28';
 @ISA     = qw(Sys::Filesystem::Unix);
 
 sub version()
@@ -158,7 +158,7 @@ L<Sys::Filesystem>, L<Sys::Filesystem::Unix>, L<fstab(5)>
 
 =head1 VERSION
 
-$Id: Freebsd.pm 69 2010-02-19 12:59:04Z trevor $
+$Id: Freebsd.pm 128 2010-05-12 13:16:44Z trevor $
 
 =head1 AUTHOR
 
@@ -170,7 +170,7 @@ Jens Rehsack <rehsack@cpan.org> - L<http://www.rehsack.de>
 
 Copyright 2004,2005,2006 Nicola Worthington.
 
-Copyright 2009 Jens Rehsack.
+Copyright 2009,2010 Jens Rehsack.
 
 This software is licensed under The Apache Software License, Version 2.0.
 

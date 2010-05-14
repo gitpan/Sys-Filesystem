@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Aix.pm 69 2010-02-19 12:59:04Z trevor $
+#   $Id: Aix.pm 128 2010-05-12 13:16:44Z trevor $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -31,7 +31,7 @@ use vars qw($VERSION);
 use Carp qw(croak);
 use IO::File;
 
-$VERSION = '1.27';
+$VERSION = '1.28';
 
 sub version()
 {
@@ -327,7 +327,7 @@ and comment char's.
 
 =head1 VERSION
 
-$Id: Aix.pm 69 2010-02-19 12:59:04Z trevor $
+$Id: Aix.pm 128 2010-05-12 13:16:44Z trevor $
 
 =head1 AUTHOR
 
@@ -339,7 +339,7 @@ Jens Rehsack <rehsack@cpan.org> - L<http://www.rehsack.de/>
 
 Copyright 2004,2005,2006 Nicola Worthington.
 
-Copyright 2008,2009 Jens Rehsack.
+Copyright 2008-2010 Jens Rehsack.
 
 This software is licensed under The Apache Software License, Version 2.0.
 
