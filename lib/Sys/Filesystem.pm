@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Filesystem.pm 141 2010-05-14 16:04:41Z trevor $
+#   $Id: Filesystem.pm 154 2010-07-02 10:01:34Z trevor $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -42,10 +42,10 @@ use Params::Util qw(_INSTANCE);
 use Scalar::Util qw(blessed);
 
 use constant DEBUG => $ENV{SYS_FILESYSTEM_DEBUG} ? 1 : 0;
-#use constant SPECIAL => ( 'darwin' eq $^O ) ? 0 : undef;
-use constant SPECIAL => undef;
+use constant SPECIAL => ( 'darwin' eq $^O ) ? 0 : undef;
+#use constant SPECIAL => undef;
 
-$VERSION = '1.28';
+$VERSION = '1.29';
 
 my ( $FsPlugin, $Supported );
 
@@ -603,7 +603,7 @@ L<perlport>, L<Solaris::DeviceTree>, L<Win32::DriveInfo>
 
 =head1 VERSION
 
-$Id: Filesystem.pm 141 2010-05-14 16:04:41Z trevor $
+$Id: Filesystem.pm 154 2010-07-02 10:01:34Z trevor $
 
 =head1 AUTHOR
 

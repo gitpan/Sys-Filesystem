@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Darwin.pm 128 2010-05-12 13:16:44Z trevor $
+#   $Id: Darwin.pm 157 2010-07-02 10:09:12Z trevor $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -34,7 +34,7 @@ require Sys::Filesystem::Unix;
 
 use Carp qw(croak);
 
-$VERSION = '1.28';
+$VERSION = '1.29';
 @ISA     = qw(Sys::Filesystem::Unix);
 
 sub version()
@@ -42,8 +42,9 @@ sub version()
     return $VERSION;
 }
 
-my @dt_keys    = qw(fs_spec fs_file fs_vfstype fs_name);
-my @mount_keys = qw(fs_spec fs_file fs_mntops);
+my @dt_keys     = qw(fs_spec fs_file fs_vfstype fs_name);
+my @mount_keys1 = qw(fs_spec fs_file fs_vfstype);
+my @mount_keys2 = qw(fs_spec fs_file fs_mntops);
 my %special_fs = (
                    devfs  => 1,
                    autofs => 1,
@@ -53,7 +54,8 @@ my $dt_rx = qr/Disk\sAppeared\s+\('([^']+)',\s*
                Mountpoint\s*=\s*'([^']+)',\s*
                fsType\s*=\s*'([^']*)',\s*
                volName\s*=\s*'([^']*)'\)/x;
-my $mount_rx = qr/(.*) on (.*) \((\w+),?.*\)/;    # /dev/disk on / (hfs,...)
+my $mount_rx1 = qr/(.*) on (.*) \((\w+),?.*\)/;    # /dev/disk on / (hfs,...)
+my $mount_rx2 = qr/(.*) on (.*) \(([^)]*)\)/;      # /dev/disk on / (hfs,...)
 
 sub new
 {
@@ -91,7 +93,8 @@ sub new
     #    $self->{$mount_point}->{label}       = $name;
     #}
 
-    $self->readMounts( $mount_rx, [ 0, 1 ], \@mount_keys, \%special_fs, @mntlist );
+    $self->readMounts( $mount_rx1, [ 0, 1, 2 ], \@mount_keys1, \%special_fs, @mntlist );
+    $self->readMounts( $mount_rx2, [ 0, 1 ], \@mount_keys2, undef, @mntlist );
 
     # set the mount options
     #foreach (@mntlist)
@@ -202,7 +205,7 @@ L<Sys::Filesystem>, L<diskutil>
 
 =head1 VERSION
 
-$Id: Darwin.pm 128 2010-05-12 13:16:44Z trevor $
+$Id: Darwin.pm 157 2010-07-02 10:09:12Z trevor $
 
 =head1 AUTHOR
 

@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Mswin32.pm 130 2010-05-12 13:19:58Z trevor $
+#   $Id: Mswin32.pm 153 2010-07-02 06:59:28Z trevor $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -30,7 +30,7 @@ use Win32::DriveInfo;
 use Carp qw(croak);
 
 use vars qw($VERSION);
-$VERSION = '1.28';
+$VERSION = '1.29';
 
 sub version()
 {
@@ -130,7 +130,7 @@ True when mounted.
 
 =head1 VERSION
 
-$Id: Mswin32.pm 130 2010-05-12 13:19:58Z trevor $
+$Id: Mswin32.pm 153 2010-07-02 06:59:28Z trevor $
 
 =head1 AUTHOR
 
