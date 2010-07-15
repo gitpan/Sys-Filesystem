@@ -1,5 +1,5 @@
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
-#   $Id: Hpux.pm 153 2010-07-02 06:59:28Z trevor $
+#   $Id: Hpux.pm 185 2010-07-15 19:25:30Z trevor $
 #
 #   Copyright (c) 2009 H.Merijn Brand,  All rights reserved.
 #   Copyright (c) 2009 Jens Rehsack,  All rights reserved.
@@ -30,7 +30,7 @@ require Sys::Filesystem::Unix;
 
 use Carp qw(croak);
 
-$VERSION = '1.29';
+$VERSION = '1.30';
 @ISA     = qw(Sys::Filesystem::Unix);
 
 sub version()
@@ -100,7 +100,7 @@ Return the version of the (sub)module.
 
 =head1 VERSION
 
-$Id: Hpux.pm 153 2010-07-02 06:59:28Z trevor $
+$Id: Hpux.pm 185 2010-07-15 19:25:30Z trevor $
 
 =head1 AUTHOR
 

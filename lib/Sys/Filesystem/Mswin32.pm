@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Mswin32.pm 153 2010-07-02 06:59:28Z trevor $
+#   $Id: Mswin32.pm 185 2010-07-15 19:25:30Z trevor $
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -30,7 +30,7 @@ use Win32::DriveInfo;
 use Carp qw(croak);
 
 use vars qw($VERSION);
-$VERSION = '1.29';
+$VERSION = '1.30';
 
 sub version()
 {
@@ -68,14 +68,13 @@ sub new
 
         $FileSystemName ||= 'CDFS' if ( $type == 5 );
 
-        $self->{$drvletter}->{mount_point} = $drvRoot;      # XXX Win32::DriveInfo gives no details here ...
-        $self->{$drvletter}->{device}      = $VolumeName;
-        $self->{$drvletter}->{format} = $FileSystemName;    # XXX Win32::DriveInfo gives sometime wrong information here
-        $self->{$drvletter}->{options} = join( ',', map { $volInfoAttrs[$_] } @attr );
-        $self->{$drvletter}->{mounted} = $type > 1;
-        if ($mounted)
+        $self->{$drvRoot}->{mount_point} = $drvRoot;        # XXX Win32::DriveInfo gives no details here ...
+        $self->{$drvRoot}->{device}      = $VolumeName;
+        $self->{$drvRoot}->{format}      = $FileSystemName; # XXX Win32::DriveInfo gives sometime wrong information here
+        $self->{$drvRoot}->{options} = join( ',', map { $volInfoAttrs[$_] } @attr );
+        if ( $self->{$drvRoot}->{mounted} = $type > 1 )
         {
-            $self->{$drvletter}->{type} = $typeExplain[$type];
+            $self->{$drvRoot}->{type} = $typeExplain[$type];
         }
     }
 
@@ -130,7 +129,7 @@ True when mounted.
 
 =head1 VERSION
 
-$Id: Mswin32.pm 153 2010-07-02 06:59:28Z trevor $
+$Id: Mswin32.pm 185 2010-07-15 19:25:30Z trevor $
 
 =head1 AUTHOR
 
