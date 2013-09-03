@@ -1,0 +1,113 @@
+{
+   "abstract" : "Retrieve list of filesystems and their properties",
+   "author" : [
+      "Jens Rehsack <rehsack@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4004, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sys-Filesystem",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.9"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Carp" : "0",
+            "FindBin" : "0",
+            "IO" : "0",
+            "IPC::Cmd" : "0.80",
+            "Module::Build" : "0.40",
+            "Module::Pluggable" : "4.5",
+            "Params::Util" : "1.00",
+            "perl" : "5.008"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Module::Pluggable" : "4.8",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "perl" : "5.018001"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "FindBin" : "0",
+            "IO" : "0",
+            "IPC::Cmd" : "0.80",
+            "Module::Build" : "0.40",
+            "Module::Pluggable" : "4.5",
+            "Params::Util" : "1.00",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Sys::Filesystem" : {
+         "file" : "lib/Sys/Filesystem.pm",
+         "version" : "1.400"
+      },
+      "Sys::Filesystem::Aix" : {
+         "file" : "lib/Sys/Filesystem/Aix.pm",
+         "version" : "1.400"
+      },
+      "Sys::Filesystem::Cygwin" : {
+         "file" : "lib/Sys/Filesystem/Cygwin.pm",
+         "version" : "1.400"
+      },
+      "Sys::Filesystem::Darwin" : {
+         "file" : "lib/Sys/Filesystem/Darwin.pm",
+         "version" : "1.400"
+      },
+      "Sys::Filesystem::Dummy" : {
+         "file" : "lib/Sys/Filesystem/Dummy.pm",
+         "version" : "1.400"
+      },
+      "Sys::Filesystem::Freebsd" : {
+         "file" : "lib/Sys/Filesystem/Freebsd.pm",
+         "version" : "1.400"
+      },
+      "Sys::Filesystem::Hpux" : {
+         "file" : "lib/Sys/Filesystem/Hpux.pm",
+         "version" : "1.400"
+      },
+      "Sys::Filesystem::Linux" : {
+         "file" : "lib/Sys/Filesystem/Linux.pm",
+         "version" : "1.400"
+      },
+      "Sys::Filesystem::Mswin32" : {
+         "file" : "lib/Sys/Filesystem/Mswin32.pm",
+         "version" : "1.400"
+      },
+      "Sys::Filesystem::Netbsd" : {
+         "file" : "lib/Sys/Filesystem/Netbsd.pm",
+         "version" : "1.400"
+      },
+      "Sys::Filesystem::Solaris" : {
+         "file" : "lib/Sys/Filesystem/Solaris.pm",
+         "version" : "1.400"
+      },
+      "Sys::Filesystem::Unix" : {
+         "file" : "lib/Sys/Filesystem/Unix.pm",
+         "version" : "1.400"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.apache.org/licenses/LICENSE-2.0.txt"
+      ],
+      "repository" : {
+         "url" : "https://github.com/rehsack/Sys-Filesystem"
+      }
+   },
+   "version" : "1.400"
+}

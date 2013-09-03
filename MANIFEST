@@ -16,14 +16,14 @@ lib/Sys/Filesystem/Solaris.pm
 lib/Sys/Filesystem/Unix.pm
 LICENSE
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST
 MANIFEST.SKIP
 META.yml
 NOTICE
 README
-t/00compile.t
-t/01pod.t
-t/02pod_coverage.t
-t/03test.t
-t/04whereami.t
+t/01_load.t
+t/02_basic.t
+t/03_whereami.t
+t/04_special.t
 TODO
+META.json

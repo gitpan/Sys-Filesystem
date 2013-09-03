@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Dummy.pm 185 2010-07-15 19:25:30Z trevor $
+#   $Id$
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -27,7 +27,7 @@ use strict;
 use Carp qw(croak);
 
 use vars qw($VERSION);
-$VERSION = '1.30';
+$VERSION = '1.400';
 
 sub version()
 {
@@ -72,7 +72,7 @@ Return the version of the (sub)module.
 
 =head1 VERSION
 
-$Id: Dummy.pm 185 2010-07-15 19:25:30Z trevor $
+$Id$
 
 =head1 AUTHOR
 

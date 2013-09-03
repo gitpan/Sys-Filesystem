@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Netbsd.pm 185 2010-07-15 19:25:30Z trevor $
+#   $Id$
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2009 Jens Rehsack
@@ -29,7 +29,7 @@ use vars qw(@ISA $VERSION);
 require Sys::Filesystem::Unix;
 use Carp qw(croak);
 
-$VERSION = '1.30';
+$VERSION = '1.400';
 @ISA     = qw(Sys::Filesystem::Unix);
 
 sub version()
@@ -137,7 +137,7 @@ checks are done at reboot time.
 
 =head1 VERSION
 
-$Id: Netbsd.pm 185 2010-07-15 19:25:30Z trevor $
+$Id$
 
 =head1 AUTHOR
 

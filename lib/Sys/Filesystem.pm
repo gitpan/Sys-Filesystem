@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Filesystem.pm 185 2010-07-15 19:25:30Z trevor $
+#   $Id$
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -45,7 +45,7 @@ use constant DEBUG => $ENV{SYS_FILESYSTEM_DEBUG} ? 1 : 0;
 use constant SPECIAL => ( 'darwin' eq $^O ) ? 0 : undef;
 #use constant SPECIAL => undef;
 
-$VERSION = '1.30';
+$VERSION = '1.400';
 
 my ( $FsPlugin, $Supported );
 
@@ -306,7 +306,7 @@ Sys::Filesystem - Retrieve list of filesystems and their properties
 Sys::Filesystem is intended to be a portable interface to list and query
 filesystem names and their properties. At the time of writing there were only
 Solaris and Win32 modules available on CPAN to perform this kind of operation.
-This module hopes to provide a consistant API to list all, mounted, unmounted
+This module hopes to provide a consistent API to list all, mounted, unmounted
 and special filesystems on a system, and query as many properties as possible
 with common aliases wherever possible.
 
@@ -603,7 +603,7 @@ L<perlport>, L<Solaris::DeviceTree>, L<Win32::DriveInfo>
 
 =head1 VERSION
 
-$Id: Filesystem.pm 185 2010-07-15 19:25:30Z trevor $
+$Id$
 
 =head1 AUTHOR
 

@@ -1,6 +1,6 @@
 ############################################################
 #
-#   $Id: Aix.pm 185 2010-07-15 19:25:30Z trevor $
+#   $Id$
 #   Sys::Filesystem - Retrieve list of filesystems and their properties
 #
 #   Copyright 2004,2005,2006 Nicola Worthington
@@ -31,7 +31,7 @@ use vars qw($VERSION);
 use Carp qw(croak);
 use IO::File;
 
-$VERSION = '1.30';
+$VERSION = '1.400';
 
 sub version()
 {
@@ -47,6 +47,9 @@ my %special_fs = (
                    mntfs  => 1,
                    autofs => 1,
                  );
+
+# see AIX commands at
+# http://publib.boulder.ibm.com/infocenter/pseries/v5r3/topic/com.ibm.aix.doc/doc/base/alphabeticallistofcommands.htm
 
 sub new
 {
@@ -92,7 +95,9 @@ sub new
         $self->{$current_filesystem}->{$state} = 1;
     }
 
-    %fs_info = map {
+    my @active_vgs = qx(/usr/sbin/lsvg -Lo);
+    scalar @active_vgs
+      and %fs_info = map {
         my ( $lvname, $type, $lps, $pps, $pvs, $lvstate, $path ) = split( m/\s+/, $_ );
 
         ( $path => [ $lvname, $type, $lps, $pps, $pvs, $lvstate ] )
@@ -327,7 +332,7 @@ and comment char's.
 
 =head1 VERSION
 
-$Id: Aix.pm 185 2010-07-15 19:25:30Z trevor $
+$Id$
 
 =head1 AUTHOR
 
