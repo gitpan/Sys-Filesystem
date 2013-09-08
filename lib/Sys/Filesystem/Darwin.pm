@@ -35,7 +35,7 @@ use IPC::Cmd ();
 
 use Carp qw(croak);
 
-$VERSION = '1.400';
+$VERSION = '1.401';
 @ISA     = qw(Sys::Filesystem::Unix);
 
 sub version()
@@ -69,7 +69,7 @@ sub new
 
     my @list_fs_cmd;
     defined $args{diskutil} and $args{diskutil} and @list_fs_cmd = ($args{diskutil}, "list");
-    scalar @list_fs_cmd or @list_fs_cmd = ($args{disktool}, "-l");
+    @list_fs_cmd or @list_fs_cmd = ($args{disktool}, "-l");
 
     # don't use backticks, don't use the shell
     my @fslist  = ();
@@ -222,7 +222,7 @@ Jens Rehsack <rehsack@cpan.org> - L<http://www.rehsack.de/>
 =head1 COPYRIGHT
 
 Copyright 2004,2005,2006 Nicola Worthington.
-Copyright 2009,2010 Jens Rehsack.
+Copyright 2009,2013 Jens Rehsack.
 
 This software is licensed under The Apache Software License, Version 2.0.
 

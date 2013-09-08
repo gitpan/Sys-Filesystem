@@ -9,12 +9,12 @@ configure_requires:
   FindBin: 0
   IO: 0
   IPC::Cmd: 0.80
-  Module::Build: 0.40
+  Module::Build: 0.2800
   Module::Pluggable: 4.5
   Params::Util: 1.00
   perl: 5.008
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4004, CPAN::Meta::Converter version 2.130880'
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132140'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,40 +23,40 @@ name: Sys-Filesystem
 provides:
   Sys::Filesystem:
     file: lib/Sys/Filesystem.pm
-    version: 1.400
+    version: 1.401
   Sys::Filesystem::Aix:
     file: lib/Sys/Filesystem/Aix.pm
-    version: 1.400
+    version: 1.401
   Sys::Filesystem::Cygwin:
     file: lib/Sys/Filesystem/Cygwin.pm
-    version: 1.400
+    version: 1.401
   Sys::Filesystem::Darwin:
     file: lib/Sys/Filesystem/Darwin.pm
-    version: 1.400
+    version: 1.401
   Sys::Filesystem::Dummy:
     file: lib/Sys/Filesystem/Dummy.pm
-    version: 1.400
+    version: 1.401
   Sys::Filesystem::Freebsd:
     file: lib/Sys/Filesystem/Freebsd.pm
-    version: 1.400
+    version: 1.401
   Sys::Filesystem::Hpux:
     file: lib/Sys/Filesystem/Hpux.pm
-    version: 1.400
+    version: 1.401
   Sys::Filesystem::Linux:
     file: lib/Sys/Filesystem/Linux.pm
-    version: 1.400
+    version: 1.401
   Sys::Filesystem::Mswin32:
     file: lib/Sys/Filesystem/Mswin32.pm
-    version: 1.400
+    version: 1.401
   Sys::Filesystem::Netbsd:
     file: lib/Sys/Filesystem/Netbsd.pm
-    version: 1.400
+    version: 1.401
   Sys::Filesystem::Solaris:
     file: lib/Sys/Filesystem/Solaris.pm
-    version: 1.400
+    version: 1.401
   Sys::Filesystem::Unix:
     file: lib/Sys/Filesystem/Unix.pm
-    version: 1.400
+    version: 1.401
 recommends:
   Module::Pluggable: 4.8
   Test::Pod: 0
@@ -67,11 +67,10 @@ requires:
   FindBin: 0
   IO: 0
   IPC::Cmd: 0.80
-  Module::Build: 0.40
   Module::Pluggable: 4.5
   Params::Util: 1.00
   perl: 5.008
 resources:
-  license: http://www.apache.org/licenses/LICENSE-2.0.txt
+  license: http://apache.org/licenses/LICENSE-2.0
   repository: https://github.com/rehsack/Sys-Filesystem
-version: 1.400
+version: 1.401
