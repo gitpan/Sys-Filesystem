@@ -23,6 +23,8 @@ package Sys::Filesystem::Linux;
 
 # vim:ts=4:sw=4:tw=78
 
+use 5.008003;
+
 use strict;
 use warnings;
 use vars qw($VERSION @ISA);
@@ -31,7 +33,7 @@ use Carp qw(croak);
 require IO::File;
 require Sys::Filesystem::Unix;
 
-$VERSION = '1.401';
+$VERSION = '1.402';
 @ISA     = qw(Sys::Filesystem::Unix);
 
 sub version()

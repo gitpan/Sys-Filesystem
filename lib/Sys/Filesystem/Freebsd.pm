@@ -24,6 +24,8 @@ package Sys::Filesystem::Freebsd;
 
 # vim:ts=4:sw=4:tw=78
 
+use 5.008003;
+
 use strict;
 use warnings;
 use vars qw(@ISA $VERSION);
@@ -31,7 +33,7 @@ use vars qw(@ISA $VERSION);
 require Sys::Filesystem::Unix;
 use Carp qw(croak);
 
-$VERSION = '1.401';
+$VERSION = '1.402';
 @ISA     = qw(Sys::Filesystem::Unix);
 
 sub version()

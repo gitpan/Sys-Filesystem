@@ -24,6 +24,8 @@ package Sys::Filesystem::Aix;
 
 # vim:ts=4:sw=4:tw=78
 
+use 5.008003;
+
 use strict;
 use warnings;
 use vars qw($VERSION);
@@ -31,7 +33,7 @@ use vars qw($VERSION);
 use Carp qw(croak);
 use IO::File;
 
-$VERSION = '1.401';
+$VERSION = '1.402';
 
 sub version()
 {

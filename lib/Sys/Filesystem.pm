@@ -24,7 +24,7 @@ package Sys::Filesystem;
 
 # vim:ts=4:sw=4:tw=78
 
-use 5.006;
+use 5.008003;
 
 my @query_order;
 
@@ -45,7 +45,7 @@ use constant DEBUG => $ENV{SYS_FILESYSTEM_DEBUG} ? 1 : 0;
 use constant SPECIAL => ( 'darwin' eq $^O ) ? 0 : undef;
 #use constant SPECIAL => undef;
 
-$VERSION = '1.401';
+$VERSION = '1.402';
 
 my ( $FsPlugin, $Supported );
 

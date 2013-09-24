@@ -20,7 +20,7 @@
 
 package Sys::Filesystem::Hpux;
 
-use 5.006;
+use 5.008003;
 
 use strict;
 use warnings;
@@ -30,7 +30,7 @@ require Sys::Filesystem::Unix;
 
 use Carp qw(croak);
 
-$VERSION = '1.401';
+$VERSION = '1.402';
 @ISA     = qw(Sys::Filesystem::Unix);
 
 sub version()
