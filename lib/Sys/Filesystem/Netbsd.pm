@@ -32,7 +32,7 @@ use vars qw(@ISA $VERSION);
 require Sys::Filesystem::Unix;
 use Carp qw(croak);
 
-$VERSION = '1.402';
+$VERSION = '1.403';
 @ISA     = qw(Sys::Filesystem::Unix);
 
 sub version()
@@ -60,7 +60,7 @@ sub new
     my $self = bless( {}, $class );
 
     # Defaults
-    $args{fstab} ||= '/etc/fstab';
+    $args{fstab} ||= $ENV{PATH_FSTAB} || '/etc/fstab';
 
     my @mounts = qx( /sbin/mount );
     $self->readMounts( $mount_rx, [ 0, 1, 2 ], [qw(fs_spec fs_file fs_vfstype fs_mntops)], \%special_fs, @mounts );
