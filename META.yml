@@ -1,62 +1,30 @@
 ---
 abstract: 'Retrieve list of filesystems and their properties'
 author:
+  - 'Nicola Worthington <nicolaw@cpan.org>'
   - 'Jens Rehsack <rehsack@cpan.org>'
 build_requires:
   Test::More: 0.9
 configure_requires:
   Carp: 0
+  ExtUtils::MakeMaker: 0
   FindBin: 0
   IO: 0
   IPC::Cmd: 0.80
-  Module::Build: 0.2800
   Module::Pluggable: 4.8
   Params::Util: 1.00
-  perl: 5.008003
+  perl: 5.008001
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830'
+generated_by: 'ExtUtils::MakeMaker version 6.8, CPAN::Meta::Converter version 2.132830'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
 name: Sys-Filesystem
-provides:
-  Sys::Filesystem:
-    file: lib/Sys/Filesystem.pm
-    version: 1.403
-  Sys::Filesystem::Aix:
-    file: lib/Sys/Filesystem/Aix.pm
-    version: 1.403
-  Sys::Filesystem::Cygwin:
-    file: lib/Sys/Filesystem/Cygwin.pm
-    version: 1.403
-  Sys::Filesystem::Darwin:
-    file: lib/Sys/Filesystem/Darwin.pm
-    version: 1.403
-  Sys::Filesystem::Dummy:
-    file: lib/Sys/Filesystem/Dummy.pm
-    version: 1.403
-  Sys::Filesystem::Freebsd:
-    file: lib/Sys/Filesystem/Freebsd.pm
-    version: 1.403
-  Sys::Filesystem::Hpux:
-    file: lib/Sys/Filesystem/Hpux.pm
-    version: 1.403
-  Sys::Filesystem::Linux:
-    file: lib/Sys/Filesystem/Linux.pm
-    version: 1.403
-  Sys::Filesystem::Mswin32:
-    file: lib/Sys/Filesystem/Mswin32.pm
-    version: 1.403
-  Sys::Filesystem::Netbsd:
-    file: lib/Sys/Filesystem/Netbsd.pm
-    version: 1.403
-  Sys::Filesystem::Solaris:
-    file: lib/Sys/Filesystem/Solaris.pm
-    version: 1.403
-  Sys::Filesystem::Unix:
-    file: lib/Sys/Filesystem/Unix.pm
-    version: 1.403
+no_index:
+  directory:
+    - t
+    - inc
 recommends:
   perl: 5.018001
 requires:
@@ -66,17 +34,7 @@ requires:
   IPC::Cmd: 0.80
   Module::Pluggable: 4.8
   Params::Util: 1.00
-  perl: 5.008003
+  perl: v5.8.1
 resources:
-  Prereqs:
-    develop:
-      recommends: {}
-      requires:
-        Test::CPAN::Changes: 0
-        Test::CheckManifest: 0
-        Test::Pod: 0
-        Test::Pod::Coverage: 0
-        Test::Pod::Spelling::CommonMistakes: 0
-  license: http://www.apache.org/licenses/LICENSE-2.0.txt
-  repository: https://github.com/rehsack/Sys-Filesystem
-version: 1.403
+  license: http://www.apache.org/licenses/LICENSE-2.0.html
+version: 1.404

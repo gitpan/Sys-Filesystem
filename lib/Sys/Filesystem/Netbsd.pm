@@ -23,7 +23,7 @@ package Sys::Filesystem::Netbsd;
 
 # vim:ts=4:sw=4:tw=78
 
-use 5.008003;
+use 5.008001;
 
 use strict;
 use warnings;
@@ -32,7 +32,7 @@ use vars qw(@ISA $VERSION);
 require Sys::Filesystem::Unix;
 use Carp qw(croak);
 
-$VERSION = '1.403';
+$VERSION = '1.404';
 @ISA     = qw(Sys::Filesystem::Unix);
 
 sub version()
@@ -63,7 +63,10 @@ sub new
     $args{fstab} ||= $ENV{PATH_FSTAB} || '/etc/fstab';
 
     my @mounts = qx( /sbin/mount );
-    $self->readMounts( $mount_rx, [ 0, 1, 2 ], [qw(fs_spec fs_file fs_vfstype fs_mntops)], \%special_fs, @mounts );
+    $self->readMounts( $mount_rx,
+                       [ 0, 1, 2 ],
+                       [qw(fs_spec fs_file fs_vfstype fs_mntops)],
+                       \%special_fs, @mounts );
     $self->readSwap( $swap_rx, qx( /sbin/swapctl -l ) );
     unless ( $self->readFsTab( $args{fstab}, \@keys, [ 0, 1, 2 ], \%special_fs ) )
     {

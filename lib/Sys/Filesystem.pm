@@ -24,7 +24,7 @@ package Sys::Filesystem;
 
 # vim:ts=4:sw=4:tw=78
 
-use 5.008003;
+use 5.008001;
 
 my @query_order;
 
@@ -34,18 +34,21 @@ use vars qw($VERSION $AUTOLOAD);
 use Carp qw(croak cluck confess);
 use Module::Pluggable
   require => 1,
-  only =>
-  [ @query_order = map { __PACKAGE__ . '::' . $_ } ucfirst( lc($^O) ), $^O =~ m/Win32/i ? 'Win32' : 'Unix', 'Dummy' ],
+  only    => [
+            @query_order = map { __PACKAGE__ . '::' . $_ } ucfirst( lc($^O) ),
+            $^O =~ m/Win32/i ? 'Win32' : 'Unix', 'Dummy'
+          ],
   inner       => 0,
   search_path => ['Sys::Filesystem'];
 use Params::Util qw(_INSTANCE);
 use Scalar::Util qw(blessed);
+use List::Util qw(first);
 
-use constant DEBUG => $ENV{SYS_FILESYSTEM_DEBUG} ? 1 : 0;
-use constant SPECIAL => ( 'darwin' eq $^O ) ? 0 : undef;
+use constant DEBUG   => $ENV{SYS_FILESYSTEM_DEBUG} ? 1 : 0;
+use constant SPECIAL => ( 'darwin' eq $^O )        ? 0 : undef;
 #use constant SPECIAL => undef;
 
-$VERSION = '1.403';
+$VERSION = '1.404';
 
 my ( $FsPlugin, $Supported );
 
@@ -60,7 +63,7 @@ BEGIN
         last;
     }
 
-    $Supported = ( $FsPlugin ne 'Sys::Filesystem::Unix' ) && ( $FsPlugin ne 'Sys::Filesystem::Dummy' );
+    $Supported = $FsPlugin ne 'Sys::Filesystem::Unix' and $FsPlugin ne 'Sys::Filesystem::Dummy';
 }
 
 sub new
@@ -121,7 +124,8 @@ sub filesystems
     }
 
     # Check we've got something sane passed
-    croak 'Odd number of elements passed when even number was expected' if ( @_ % 2 );
+    @_ % 2 and croak 'Odd number of elements passed when even number was expected';
+
     my $params = {@_};
     for my $param ( keys %{$params} )
     {
@@ -133,53 +137,34 @@ sub filesystems
     if ( exists $params->{regular} )
     {
         delete $params->{regular};
-        if ( exists( $params->{special} ) )
-        {
-            carp("Both parameters specified, 'special' and 'regular', which are mutually exclusive");
-        }
+        exists( $params->{special} )
+          and carp("Mutual exclusive parameters 'special' and 'regular' specified together");
         $params->{special} = SPECIAL;
     }
 
     my @filesystems = ();
 
     # Return list of all filesystems
-    unless ( keys %{$params} )
-    {
-        @filesystems = sort( keys( %{ $self->{filesystems} } ) );
+    keys %{$params} or return sort( keys( %{ $self->{filesystems} } ) );
 
-        # Return list of specific filesystems
-    }
-    else
+    for my $fsname ( sort( keys( %{ $self->{filesystems} } ) ) )
     {
-        for my $fs ( sort( keys( %{ $self->{filesystems} } ) ) )
+        for my $requirement ( keys( %{$params} ) )
         {
-            for my $requirement ( keys( %{$params} ) )
-            {
-                my $fsreqname = $requirement;
-                if (   !exists( $self->{filesystems}->{$fs}->{$requirement} )
-                     && exists( $self->{aliases}->{$requirement} ) )
-                {
-                    foreach my $fsreqdef ( @{ $self->{aliases}->{$requirement} } )
-                    {
-                        if ( exists( $self->{filesystems}->{$fs}->{$fsreqdef} ) )
-                        {
-                            $fsreqname = $fsreqdef;
-                            last;
-                        }
-                    }
-                }
-                if (
-                     (
-                          ( defined( $params->{$requirement} ) && exists( $self->{filesystems}->{$fs}->{$fsreqname} ) )
-                       && ( $self->{filesystems}->{$fs}->{$fsreqname} eq $params->{$requirement} )
-                     )
-                     || ( !defined( $params->{$requirement} ) && !exists( $self->{filesystems}->{$fs}->{$fsreqname} ) )
-                   )
-                {
-                    push( @filesystems, $fs );
-                    last;
-                }
-            }
+            my $fs = $self->{filesystems}->{$fsname};
+            my $fsreqname =
+              ( !exists $fs->{$requirement} and exists $self->{aliases}->{$requirement} )
+              ? first { exists $fs->{$_} } @{ $self->{aliases}->{$requirement} }
+              : $requirement;
+
+            defined $params->{$requirement}
+              and exists $fs->{$fsreqname}
+              and $fs->{$fsreqname} eq $params->{$requirement}
+              and push( @filesystems, $fsname )
+              and last;
+            push( @filesystems, $fsname ) and last
+              unless defined( $params->{$requirement} )
+              or exists( $fs->{$fsreqname} );
         }
     }
 
@@ -187,7 +172,7 @@ sub filesystems
     return @filesystems;
 }
 
-sub supported()
+sub supported
 {
     return $Supported;
 }
@@ -216,38 +201,27 @@ sub DESTROY { }
 
 sub AUTOLOAD
 {
-    my ( $self, $fs ) = @_;
+    my ( $self, $fsname ) = @_;
 
     croak "$self is not an object" unless ( blessed($self) );
-    croak "No filesystem passed where expected" unless ($fs);
+    croak "No filesystem passed where expected" unless ($fsname);
 
     ( my $name = $AUTOLOAD ) =~ s/.*://;
 
     # No such filesystem
-    unless ( exists $self->{filesystems}->{$fs} )
-    {
-        croak "No such filesystem";
-    }
-    else
-    {
-        # Found the property
-        if ( exists $self->{filesystems}->{$fs}->{$name} )
-        {
-            return $self->{filesystems}->{$fs}->{$name};
-        }
-        elsif ( exists $self->{aliases}->{$name} )
-        {    # Didn't find the property, but check any aliases
-            for my $alias ( @{ $self->{aliases}->{$name} } )
-            {
-                if ( exists $self->{filesystems}->{$fs}->{$alias} )
-                {    # Found the Alias
-                    return $self->{filesystems}->{$fs}->{$alias};
-                }
-            }
-        }
-    }
+    exists $self->{filesystems}->{$fsname} or croak "No such filesystem";
 
-    return undef;
+    # Found the property
+    my $fs = $self->{filesystems}->{$fsname};
+
+    exists $fs->{$name} and return $fs->{$name};
+
+    # Didn't find the property, but check any aliases
+    exists $self->{aliases}->{$name}
+      and $name = first { exists $fs->{$_} } @{ $self->{aliases}->{$name} }
+      and return $fs->{$name};
+
+    return;
 }
 
 sub TRACE

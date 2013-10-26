@@ -23,11 +23,13 @@ package Sys::Filesystem::Dummy;
 
 # vim:ts=4:sw=4:tw=78
 
+use 5.008001;
+
 use strict;
 use Carp qw(croak);
 
 use vars qw($VERSION);
-$VERSION = '1.403';
+$VERSION = '1.404';
 
 sub version()
 {

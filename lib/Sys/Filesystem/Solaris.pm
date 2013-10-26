@@ -24,7 +24,7 @@ package Sys::Filesystem::Solaris;
 
 # vim:ts=4:sw=4:tw=78
 
-use 5.008003;
+use 5.008001;
 
 use strict;
 use warnings;
@@ -34,7 +34,7 @@ use Carp qw(croak);
 use Data::Dumper;
 require Sys::Filesystem::Unix;
 
-$VERSION = '1.403';
+$VERSION = '1.404';
 @ISA     = qw(Sys::Filesystem::Unix);
 
 sub version()
