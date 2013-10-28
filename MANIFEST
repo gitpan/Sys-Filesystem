@@ -17,6 +17,8 @@ LICENSE
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
+META.json
+META.yml
 NOTICE
 README
 t/01_load.t
@@ -24,5 +26,3 @@ t/02_basic.t
 t/03_whereami.t
 t/04_special.t
 TODO
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

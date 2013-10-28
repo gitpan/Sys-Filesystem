@@ -34,7 +34,7 @@ requires:
   IPC::Cmd: 0.80
   Module::Pluggable: 4.8
   Params::Util: 1.00
-  perl: v5.8.1
+  perl: 5.008001
 resources:
   license: http://www.apache.org/licenses/LICENSE-2.0.html
-version: 1.404
+version: 1.405

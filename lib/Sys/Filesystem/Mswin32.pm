@@ -33,7 +33,7 @@ use Params::Util qw(_STRING);
 use Win32::DriveInfo;
 use Carp qw(croak);
 
-$VERSION = '1.404';
+$VERSION = '1.405';
 
 sub version()
 {
@@ -49,8 +49,12 @@ my @volInfoAttrs = (
                      'file compression',
                      'compressed volume'
                    );
-my @typeExplain =
-  ( 'not determined', 'not available', 'removeable', 'fixed', 'network', 'cdrom', 'ram disk' );
+my @typeExplain = (
+                    'unable to determine', 'no root directory',
+                    'removeable',          'fixed',
+                    'network',             'cdrom',
+                    'ram disk'
+                  );
 
 sub new
 {
@@ -67,28 +71,25 @@ sub new
           Win32::DriveInfo::VolumeInfo($drvletter);
 
         my $drvRoot = $drvletter . ":/";
-        if ( defined( _STRING($VolumeName) ) )
-        {
-            $VolumeName =~ s/\\/\//g;
-            $VolumeName = ucfirst($VolumeName);
-        }
-        else
-        {
-            $VolumeName = $drvRoot;
-        }
+        defined( _STRING($VolumeName) ) and $VolumeName =~ s/\\/\//g;
+        defined( _STRING($VolumeName) ) or $VolumeName = $drvRoot;
+        $VolumeName = ucfirst($VolumeName);
 
         $FileSystemName ||= 'CDFS' if ( $type == 5 );
 
-        $self->{$drvRoot}->{mount_point} =
-          $drvRoot;    # XXX Win32::DriveInfo gives no details here ...
-        $self->{$drvRoot}->{device} = $VolumeName;
-        $self->{$drvRoot}->{format} =
-          $FileSystemName;    # XXX Win32::DriveInfo gives sometime wrong information here
+        # XXX Win32::DriveInfo gives no details here ...
+        $self->{$drvRoot}->{mount_point} = $drvRoot;
+        $self->{$drvRoot}->{device}      = $VolumeName;
+        # XXX Win32::DriveInfo gives sometime wrong information here
+        $self->{$drvRoot}->{format} = $FileSystemName;
         $self->{$drvRoot}->{options} = join( ',', map { $volInfoAttrs[$_] } @attr );
-        if ( $self->{$drvRoot}->{mounted} = $type > 1 )
-        {
-            $self->{$drvRoot}->{type} = $typeExplain[$type];
-        }
+        my $mntstate = ( ( defined $FileSystemName ) and $type > 1 );
+        $mntstate
+          and 2 == $type
+          and $mntstate = Win32::DriveInfo::IsReady($drvletter);
+        $mntstate = $mntstate ? "mounted" : "unmounted";
+        $self->{$drvRoot}->{$mntstate} = 1;
+        $type > 0 and $self->{$drvRoot}->{type} = $typeExplain[$type];
     }
 
     bless( $self, $class );
