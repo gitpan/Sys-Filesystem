@@ -30,10 +30,11 @@ use warnings;
 use vars qw($VERSION @ISA);
 
 use Carp qw(croak);
-require IO::File;
-require Sys::Filesystem::Unix;
+use Cwd 'abs_path';
+use IO::File              ();
+use Sys::Filesystem::Unix ();
 
-$VERSION = '1.405';
+$VERSION = '1.406';
 @ISA     = qw(Sys::Filesystem::Unix);
 
 sub version()
@@ -42,23 +43,23 @@ sub version()
 }
 
 # Default fstab and mtab layout
-my @keys = qw(fs_spec fs_file fs_vfstype fs_mntops fs_freq fs_passno);
+my @keys       = qw(fs_spec fs_file fs_vfstype fs_mntops fs_freq fs_passno);
 my %special_fs = (
-                   binfmt_misc             => 1,
-                   debugfs                 => 1,
-                   devpts                  => 1,
-                   fusectl                 => 1,
-                   'fuse.gvfs-fuse-daemon' => 1,
-                   mini_fo                 => 1,
-                   nfsd                    => 1,
-                   proc                    => 1,
-                   procbususb              => 1,
-                   securityfs              => 1,
-                   swap                    => 1,
-                   sysfs                   => 1,
-                   tmpfs                   => 1,
-                   udev                    => 1,
-                 );
+    binfmt_misc             => 1,
+    debugfs                 => 1,
+    devpts                  => 1,
+    fusectl                 => 1,
+    'fuse.gvfs-fuse-daemon' => 1,
+    mini_fo                 => 1,
+    nfsd                    => 1,
+    proc                    => 1,
+    procbususb              => 1,
+    securityfs              => 1,
+    swap                    => 1,
+    sysfs                   => 1,
+    tmpfs                   => 1,
+    udev                    => 1,
+);
 
 sub new
 {
@@ -68,8 +69,9 @@ sub new
 
     # Defaults
     $args{fstab} ||= '/etc/fstab';
-    $args{mtab} ||= -r '/proc/self/mounts' ? '/proc/self/mounts' : '/etc/mtab';
+    $args{mtab} ||= -r '/proc/mounts' ? '/proc/mounts' : '/etc/mtab';
     #$args{xtab}  ||= '/etc/lib/nfs/xtab';
+    $args{canondev} and $self->{canondev} = 1;
 
     local $/ = "\n";
 
@@ -80,18 +82,15 @@ sub new
         {
             next if ( /^\s*#/ || /^\s*$/ );
             my @vals = split( ' ', $_ );
-            if ( $vals[0] =~ /^\s*LABEL=(.+)\s*$/ )
-            {
-                $self->{ $vals[1] }->{label} = $1;
-            }
+            $vals[0] =~ /^\s*LABEL=(.+)\s*$/
+              and $self->{ $vals[1] }->{label} = $1;
+            $args{canondev} and -l $vals[0] and $vals[0] = abs_path( $vals[0] );
             $self->{ $vals[1] }->{mount_point} = $vals[1];
             $self->{ $vals[1] }->{device}      = $vals[0];
             $self->{ $vals[1] }->{unmounted}   = 1;
-            $self->{ $vals[1] }->{special}     = 1 if ( defined( $special_fs{ $vals[2] } ) );
-            for ( my $i = 0; $i < @keys; ++$i )
-            {
-                $self->{ $vals[1] }->{ $keys[$i] } = $vals[$i];
-            }
+            defined $special_fs{ $vals[2] }
+              and $self->{ $vals[1] }->{special} = 1;
+            @{ $self->{ $vals[1] } }{@keys} = @vals;
         }
         $fstab->close();
     }
@@ -105,6 +104,8 @@ sub new
     {
         croak "Unable to open fstab file ($args{mtab})\n";
     }
+
+    delete $self->{canondev};
 
     $self;
 }
@@ -233,7 +234,7 @@ Jens Rehsack <rehsack@cpan.org> - L<http://www.rehsack.de/>
 
 Copyright 2004,2005,2006 Nicola Worthington.
 
-Copyright 2009,2013 Jens Rehsack.
+Copyright 2009-2014 Jens Rehsack.
 
 This software is licensed under The Apache Software License, Version 2.0.
 

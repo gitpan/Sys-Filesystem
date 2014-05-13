@@ -33,7 +33,7 @@ use vars qw(@ISA $VERSION);
 require Sys::Filesystem::Unix;
 use Carp qw(croak);
 
-$VERSION = '1.405';
+$VERSION = '1.406';
 @ISA     = qw(Sys::Filesystem::Unix);
 
 sub version()
@@ -41,13 +41,13 @@ sub version()
     return $VERSION;
 }
 
-my @keys = qw(fs_spec fs_file fs_vfstype fs_mntops fs_freq fs_passno);
+my @keys       = qw(fs_spec fs_file fs_vfstype fs_mntops fs_freq fs_passno);
 my %special_fs = (
-                   swap   => 1,
-                   proc   => 1,
-                   devpts => 1,
-                   tmpfs  => 1,
-                 );
+    swap   => 1,
+    proc   => 1,
+    devpts => 1,
+    tmpfs  => 1,
+);
 
 my $mount_rx = qr|^([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)|;
 my $swap_rx  = qr|^(/[/\w]+)\s+|;
@@ -57,6 +57,7 @@ sub new
     ref( my $class = shift ) && croak 'Class name required';
     my %args = @_;
     my $self = bless( {}, $class );
+    $args{canondev} and $self->{canondev} = 1;
 
     $args{fstab} ||= $ENV{PATH_FSTAB} || '/etc/fstab';
 
@@ -67,6 +68,8 @@ sub new
     {
         croak "Unable to open fstab file ($args{fstab})\n";
     }
+
+    delete $self->{canondev};
 
     $self;
 }
@@ -172,7 +175,7 @@ Jens Rehsack <rehsack@cpan.org> - L<http://www.rehsack.de>
 
 Copyright 2004,2005,2006 Nicola Worthington.
 
-Copyright 2009,2013 Jens Rehsack.
+Copyright 2009-2014 Jens Rehsack.
 
 This software is licensed under The Apache Software License, Version 2.0.
 

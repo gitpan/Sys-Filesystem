@@ -34,7 +34,7 @@ use Carp qw(croak);
 use Data::Dumper;
 require Sys::Filesystem::Unix;
 
-$VERSION = '1.405';
+$VERSION = '1.406';
 @ISA     = qw(Sys::Filesystem::Unix);
 
 sub version()
@@ -45,26 +45,27 @@ sub version()
 my @fstab_keys = qw(device device_to_fsck mount_point fs_vfstype fs_freq mount_at_boot fs_mntops);
 my @mtab_keys  = qw(device mount_point fs_vfstype fs_mntops time);
 my %special_fs = (
-                   swap    => 1,
-                   proc    => 1,
-                   procfs  => 1,
-                   tmpfs   => 1,
-                   mntfs   => 1,
-                   autofs  => 1,
-                   lofs    => 1,
-                   fd      => 1,
-                   ctfs    => 1,
-                   devfs   => 1,
-                   dev     => 1,
-                   objfs   => 1,
-                   cachefs => 1,
-                 );
+    swap    => 1,
+    proc    => 1,
+    procfs  => 1,
+    tmpfs   => 1,
+    mntfs   => 1,
+    autofs  => 1,
+    lofs    => 1,
+    fd      => 1,
+    ctfs    => 1,
+    devfs   => 1,
+    dev     => 1,
+    objfs   => 1,
+    cachefs => 1,
+);
 
 sub new
 {
     ref( my $class = shift ) && croak 'Class name required';
     my %args = @_;
     my $self = bless( {}, $class );
+    $args{canondev} and $self->{canondev} = 1;
 
     $args{fstab} ||= '/etc/vfstab';
     $args{mtab}  ||= '/etc/mnttab';
@@ -78,6 +79,8 @@ sub new
     {
         croak "Unable to open mtab file ($args{mtab})\n";
     }
+
+    delete $self->{canondev};
 
     $self;
 }
@@ -169,7 +172,7 @@ Jens Rehsack <rehsack@cpan.org> - L<http://www.rehsack.de/>
 =head1 COPYRIGHT
 
 Copyright 2004,2005,2006 Nicola Worthington.
-Copyright 2009,2013 Jens Rehsack.
+Copyright 2009-2014 Jens Rehsack.
 
 This software is licensed under The Apache Software License, Version 2.0.
 

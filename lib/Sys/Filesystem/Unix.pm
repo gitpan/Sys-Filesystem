@@ -31,10 +31,11 @@ use warnings;
 use vars qw($VERSION);
 
 use Carp qw(croak);
+use Cwd 'abs_path';
 use Fcntl qw(:flock);
 use IO::File;
 
-$VERSION = '1.405';
+$VERSION = '1.406';
 
 sub version()
 {
@@ -42,26 +43,27 @@ sub version()
 }
 
 # Default fstab and mtab layout
-my @keys = qw(fs_spec fs_file fs_vfstype fs_mntops fs_freq fs_passno);
+my @keys       = qw(fs_spec fs_file fs_vfstype fs_mntops fs_freq fs_passno);
 my %special_fs = (
-                   swap => 1,
-                   proc => 1
-                 );
+    swap => 1,
+    proc => 1
+);
 
 sub new
 {
     ref( my $class = shift ) && croak 'Class name required';
     my %args = @_;
     my $self = bless( {}, $class );
+    $args{canondev} and $self->{canondev} = 1;
 
     # Defaults
     $args{fstab} ||= '/etc/fstab';
     $args{mtab}  ||= '/etc/mtab';
 
-    # $args{xtab}  ||= '/etc/lib/nfs/xtab';
-
     $self->readFsTab( $args{fstab}, \@keys, [ 0, 1, 2 ], \%special_fs );
     $self->readMntTab( $args{mtab}, \@keys, [ 0, 1, 2 ], \%special_fs );
+
+    delete $self->{canondev};
 
     $self;
 }
@@ -82,6 +84,7 @@ sub readFsTab($\@\@\%)
             # next if( /^\s*$/ );
 
             my @vals = split( ' ', $_ );
+            $self->{canondev} and -l $vals[ $pridx->[0] ] and $vals[ $pridx->[0] ] = abs_path( $vals[ $pridx->[0] ] );
             $self->{ $vals[ $pridx->[1] ] }->{mount_point} = $vals[ $pridx->[1] ];
             $self->{ $vals[ $pridx->[1] ] }->{device}      = $vals[ $pridx->[0] ];
             $self->{ $vals[ $pridx->[1] ] }->{unmounted}   = 1
@@ -131,6 +134,7 @@ sub readMntTab($\@\@\%)
             # next if( /^\s*$/ );
 
             my @vals = split( /\s+/, $_ );
+            $self->{canondev} and -l $vals[ $pridx->[0] ] and $vals[ $pridx->[0] ] = abs_path( $vals[ $pridx->[0] ] );
             delete $self->{ $vals[ $pridx->[1] ] }->{unmounted}
               if ( exists( $self->{ $vals[ $pridx->[1] ] }->{unmounted} ) );
             $self->{ $vals[ $pridx->[1] ] }->{mounted}     = 1;
@@ -172,6 +176,7 @@ sub readMounts
     {
         if ( my @vals = $line =~ $mount_rx )
         {
+            $self->{canondev} and -l $vals[ $pridx->[0] ] and $vals[ $pridx->[0] ] = abs_path( $vals[ $pridx->[0] ] );
             $self->{ $vals[ $pridx->[1] ] }->{mount_point} = $vals[ $pridx->[1] ];
             $self->{ $vals[ $pridx->[1] ] }->{device}      = $vals[ $pridx->[0] ];
             $self->{ $vals[ $pridx->[1] ] }->{mounted}     = 1;
@@ -207,6 +212,7 @@ sub readSwap
     {
         if ( my ($dev) = $line =~ $swap_rx )
         {
+            $self->{canondev} and -l $dev and $dev = abs_path($dev);
             $self->{none}->{mount_point} ||= 'none';
             $self->{none}->{device}     = $dev;
             $self->{none}->{fs_vfstype} = 'swap';
@@ -361,7 +367,7 @@ Jens Rehsack <rehsack@cpan.org> - L<http://www.rehsack.de/>
 =head1 COPYRIGHT
 
 Copyright 2004,2005,2006 Nicola Worthington.
-Copyright 2008-2013 Jens Rehsack.
+Copyright 2008-2014 Jens Rehsack.
 
 This software is licensed under The Apache Software License, Version 2.0.
 

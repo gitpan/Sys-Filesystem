@@ -35,7 +35,7 @@ use IPC::Cmd ();
 
 use Carp qw(croak);
 
-$VERSION = '1.405';
+$VERSION = '1.406';
 @ISA     = qw(Sys::Filesystem::Unix);
 
 sub version()
@@ -46,10 +46,10 @@ sub version()
 my @dt_keys     = qw(fs_spec fs_file fs_vfstype fs_name);
 my @mount_keys1 = qw(fs_spec fs_file fs_vfstype);
 my @mount_keys2 = qw(fs_spec fs_file fs_mntops);
-my %special_fs = (
-                   devfs  => 1,
-                   autofs => 1,
-                 );
+my %special_fs  = (
+    devfs  => 1,
+    autofs => 1,
+);
 
 my $dt_rx = qr/Disk\sAppeared\s+\('([^']+)',\s*
                Mountpoint\s*=\s*'([^']+)',\s*
@@ -62,12 +62,12 @@ sub new
 {
     my ( $class, %args ) = @_;
     my $self = bless( {}, $class );
+    $args{canondev} and $self->{canondev} = 1;
 
     foreach my $prog (qw(diskutil disktool mount))
     {
         defined $args{$prog}
-          or $args{$prog} =
-          ( grep { defined $_ and -x $_ } ( "/usr/sbin/$prog", "/sbin/$prog" ) )[0];
+          or $args{$prog} = ( grep { defined $_ and -x $_ } ( "/usr/sbin/$prog", "/sbin/$prog" ) )[0];
     }
 
     my @list_fs_cmd;
@@ -121,6 +121,8 @@ sub new
     #        $self->{$mount_point}->{fs_mntops} = $mntopts;
     #    }
     #}
+
+    delete $self->{canondev};
 
     $self;
 }
@@ -231,7 +233,7 @@ Jens Rehsack <rehsack@cpan.org> - L<http://www.rehsack.de/>
 =head1 COPYRIGHT
 
 Copyright 2004,2005,2006 Nicola Worthington.
-Copyright 2009,2013 Jens Rehsack.
+Copyright 2009-2014 Jens Rehsack.
 
 This software is licensed under The Apache Software License, Version 2.0.
 

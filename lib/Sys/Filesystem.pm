@@ -30,31 +30,28 @@ my @query_order;
 
 use strict;
 use warnings;
-use vars qw($VERSION $AUTOLOAD);
+use vars qw($VERSION $AUTOLOAD $CANONDEV $FSTAB $MTAB);
 use Carp qw(croak cluck confess);
 use Module::Pluggable
   require => 1,
-  only    => [
-            @query_order = map { __PACKAGE__ . '::' . $_ } ucfirst( lc($^O) ),
-            $^O =~ m/Win32/i ? 'Win32' : 'Unix', 'Dummy'
-          ],
-  inner       => 0,
-  search_path => ['Sys::Filesystem'];
+  only  => [ @query_order = map { __PACKAGE__ . '::' . $_ } ( ucfirst( lc $^O ), $^O =~ m/Win32/i ? 'Win32' : 'Unix', 'Dummy' ) ],
+  inner => 0,
+  search_path => ['Sys::Filesystem'],
+  sub_name    => '_plugins';
 use Params::Util qw(_INSTANCE);
 use Scalar::Util qw(blessed);
 use List::Util qw(first);
 
 use constant DEBUG   => $ENV{SYS_FILESYSTEM_DEBUG} ? 1 : 0;
 use constant SPECIAL => ( 'darwin' eq $^O )        ? 0 : undef;
-#use constant SPECIAL => undef;
 
-$VERSION = '1.405';
+$VERSION = '1.406';
 
 my ( $FsPlugin, $Supported );
 
 BEGIN
 {
-    Sys::Filesystem->plugins();
+    Sys::Filesystem->_plugins();
 
     foreach my $qo (@query_order)
     {
@@ -69,42 +66,45 @@ BEGIN
 sub new
 {
     # Check we're being called correctly with a class name
-    ref( my $class = shift ) && croak 'Class name required';
+    ref( my $class = shift ) and croak 'Class name required';
 
     # Check we've got something sane passed
     croak 'Odd number of elements passed when even number was expected' if ( @_ % 2 );
     my %args = @_;
 
+    exists $args{xtab} and carp("Using xtab is depreciated") and delete $args{xtab};
+    defined $FSTAB    and not exists $args{fstab}    and $args{fstab}    = $FSTAB;
+    defined $MTAB     and not exists $args{mtab}     and $args{mtab}     = $MTAB;
+    defined $CANONDEV and not exists $args{canondev} and $args{canondev} = $CANONDEV;
+
     # Double check the key pairs for stuff we recognise
-    while ( my ( $k, $v ) = each(%args) )
-    {
-        unless ( grep( /^$k$/i, qw(fstab mtab xtab) ) )
-        {
-            croak("Unrecognised paramater '$k' passed to module $class");
-        }
-    }
+    my @sane_keys = qw(aliases canondev fstab mtab);
+    my %sane_args;
+    @sane_args{@sane_keys} = delete @args{@sane_keys};
+    scalar keys %args and croak( "Unrecognised parameter(s) '" . join( "', '", sort keys %args ) . "' passed to module $class" );
 
-    my $self = {%args};
+    my $self = {%sane_args};
 
-    # Filesystem property aliases
-    $self->{aliases} = {
-                         device          => [qw(fs_spec dev)],
-                         filesystem      => [qw(fs_file mount_point)],
-                         mount_point     => [qw(fs_file filesystem)],
-                         type            => [qw(fs_vfstype vfs)],
-                         format          => [qw(fs_vfstype vfs vfstype)],
-                         options         => [qw(fs_mntops)],
-                         check_frequency => [qw(fs_freq)],
-                         check_order     => [qw(fs_passno)],
-                         boot_order      => [qw(fs_mntno)],
-                         volume          => [qw(fs_volume fs_vol vol)],
-                         label           => [qw(fs_label)],
-                       };
+    # Filesystem property aliases - unless caller knows better ...
+    defined $self->{aliases}
+      or $self->{aliases} = {
+        device          => [qw(fs_spec dev)],
+        filesystem      => [qw(fs_file mount_point)],
+        mount_point     => [qw(fs_file filesystem)],
+        type            => [qw(fs_vfstype vfs)],
+        format          => [qw(fs_vfstype vfs vfstype)],
+        options         => [qw(fs_mntops)],
+        check_frequency => [qw(fs_freq)],
+        check_order     => [qw(fs_passno)],
+        boot_order      => [qw(fs_mntno)],
+        volume          => [qw(fs_volume fs_vol vol)],
+        label           => [qw(fs_label)],
+      };
 
     # Debug
     DUMP( '$self', $self ) if (DEBUG);
 
-    $self->{filesystems} = $FsPlugin->new(%args);
+    $self->{filesystems} = $FsPlugin->new(%sane_args);
 
     # Maybe upchuck a little
     croak "Unable to create object for OS type '$self->{osname}'" unless ( $self->{filesystems} );
@@ -295,17 +295,28 @@ with common aliases wherever possible.
 
 =item new
 
-Creates a new Sys::Filesystem object. new() accepts 3 optional key pair values
-to help or force where mount information is gathered from. These values are
-not otherwise defaulted by the main Sys::Filesystem object, but left to the
-platform specific helper modules to determine as an exercise of common sense.
+Creates a new Sys::Filesystem object. C<new> accepts following optional key
+value pairs to help or force where mount information is gathered from. These
+values are not otherwise defaulted by the main Sys::Filesystem object, but
+left to the platform specific helper modules to determine as an exercise of
+common sense.
 
 =over 4
+
+=item canondev
+
+Specify whether device path's shall be resolved when they're a symbolic
+link.
+
+C<$Sys::Filesystem::CANONDEV> is used when no key C<canondev> is passed.
 
 =item fstab
 
 Specify the full path and filename of the filesystem table (or fstab for
-short).
+short). Not all platforms have such a file and so this option may be
+ignored on some systems.
+
+C<$Sys::Filesystem::FSTAB> is used when no key C<fstab> is passed.
 
 =item mtab
 
@@ -313,12 +324,25 @@ Specify the full path and filename of the mounted filesystem table (or mtab
 for short). Not all platforms have such a file and so this option may be
 ignored on some systems.
 
+C<$Sys::Filesystem::MTAB> is used when no key C<mtab> is passed.
+
 =item xtab
 
-Specify the full path and filename of the mounted NFS filesystem table
-(or xtab for short). This is usually only pertinant to Unix bases systems.
-Not all helper modules will query NFS mounts as a separate exercise, and
-therefore this option may be ignored on some systems.
+B<DEPRECIATED> Specify the full path and filename of the mounted NFS
+filesystem table (or xtab for short). This is usually only pertinant
+to Unix bases systems.  Not all helper modules will query NFS mounts
+as a separate exercise, and therefore this option may be ignored on
+some systems.
+
+B<None> of the OS plugins use that tunable (anymore?), so it now a warning
+is raised when it's used. The entire support will be removed not before
+2015. Once that happened, using C<xtab> will raise an exception.
+
+=item aliases
+
+Overrides internal aliasing table used to match queries against OS
+plugin. This should be used only when dealing with closed source platform
+helper module(s).
 
 =back
 
@@ -593,7 +617,7 @@ See CREDITS in the distribution tarball.
 
 Copyright 2004,2005,2006 Nicola Worthington.
 
-Copyright 2008-2013 Jens Rehsack.
+Copyright 2008-2014 Jens Rehsack.
 
 This software is licensed under The Apache Software License, Version 2.0.
 

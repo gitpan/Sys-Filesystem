@@ -30,7 +30,7 @@ require Sys::Filesystem::Unix;
 
 use Carp qw(croak);
 
-$VERSION = '1.405';
+$VERSION = '1.406';
 @ISA     = qw(Sys::Filesystem::Unix);
 
 sub version()
@@ -42,9 +42,9 @@ sub version()
 my @fstabkeys  = qw(fs_spec fs_file fs_vfstype fs_mntops fs_freq fs_passno);
 my @mnttabkeys = qw(fs_spec fs_file fs_vfstype fs_mntops fs_freq fs_passno mount_time);
 my %special_fs = (
-                   swap => 1,
-                   proc => 1
-                 );
+    swap => 1,
+    proc => 1
+);
 
 sub new
 {
@@ -52,6 +52,7 @@ sub new
     my $class = ref($proto) || $proto or croak 'Class name required';
     my %args  = @_;
     my $self  = bless( {}, $class );
+    $args{canondev} and $self->{canondev} = 1;
 
     # Defaults
     $args{fstab} ||= '/etc/fstab';
@@ -66,6 +67,8 @@ sub new
     {
         croak "Unable to open fstab file ($args{mtab})\n";
     }
+
+    delete $self->{canondev};
 
     $self;
 }
@@ -110,7 +113,7 @@ H.Merijn Brand, PROCURA B.V.
 
 Copyright 2009 H.Merijn Brand PROCURA B.V.
 
-Copyright 2009,2013 Jens Rehsack.
+Copyright 2009-2014 Jens Rehsack.
 
 This software is licensed under The Apache Software License, Version 2.0.
 

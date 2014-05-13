@@ -5,7 +5,7 @@
       "Jens Rehsack <rehsack@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.8, CPAN::Meta::Converter version 2.132830",
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141170",
    "license" : [
       "apache_2_0"
    ],
@@ -27,13 +27,14 @@
       "configure" : {
          "requires" : {
             "Carp" : "0",
+            "Cwd" : "0",
             "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
             "FindBin" : "0",
             "IO" : "0",
             "IPC::Cmd" : "0.80",
             "Module::Pluggable" : "4.8",
-            "Params::Util" : "1.00",
-            "perl" : "5.008001"
+            "Params::Util" : "1.00"
          }
       },
       "develop" : {
@@ -51,12 +52,13 @@
          },
          "requires" : {
             "Carp" : "0",
+            "Cwd" : "0",
+            "File::Spec" : "0",
             "FindBin" : "0",
             "IO" : "0",
             "IPC::Cmd" : "0.80",
             "Module::Pluggable" : "4.8",
-            "Params::Util" : "1.00",
-            "perl" : "5.008001"
+            "Params::Util" : "1.00"
          }
       },
       "test" : {
@@ -67,9 +69,15 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "license" : [
-         "http://www.apache.org/licenses/LICENSE-2.0.html"
-      ]
+      "bugtracker" : {
+         "mailto" : "fsys-filesystem@rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Sys-Filesystem"
+      },
+      "homepage" : "https://metacpan.org/release/Sys-Filesystem",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/rehsack/Sys-Filesystem"
+      }
    },
-   "version" : "1.405"
+   "version" : "1.406"
 }

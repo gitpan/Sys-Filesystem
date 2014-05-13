@@ -1,3 +1,8 @@
+#!perl
+
+use strict;
+use warnings;
+
 use Test::More;
 use Sys::Filesystem;
 use Cwd qw(abs_path);
@@ -14,7 +19,8 @@ $RealTest = ucfirst($RealTest) if ( $^O =~ m/Win32/ );
 
 my $sfs;
 eval { $sfs = Sys::Filesystem->new(); };
-plan( skip_all => "Cannot initialize Sys::Filesystem" ) if ($@);
+$@ and plan skip_all => "Cannot initialize Sys::Filesystem: $@";
+
 ok( ref($sfs) eq 'Sys::Filesystem', 'Create new Sys::Filesystem object' );
 
 my ( $binmount, $mymount );
@@ -47,9 +53,8 @@ SKIP:
   TODO:
     {
         local $TODO = "Known fail for MSWin32, cygwin & Co. - let's make it not so important ...";
-        ok( $mymount, sprintf( q{Found mountpoint for test file '%s' at '%s'}, $RealTest, $mymount || '<n/a>' ) );
-        ok( $binmount,
-            sprintf( q{Found mountpoint for perl executable '%s' at '%s'}, $RealPerl, $binmount || '<n/a>' ) );
+        ok( $mymount,  sprintf( q{Found mountpoint for test file '%s' at '%s'},       $RealTest, $mymount  || '<n/a>' ) );
+        ok( $binmount, sprintf( q{Found mountpoint for perl executable '%s' at '%s'}, $RealPerl, $binmount || '<n/a>' ) );
     }
 }
 

@@ -32,7 +32,7 @@ use vars qw($VERSION @ISA);
 use Carp qw(croak);
 require Sys::Filesystem::Unix;
 
-$VERSION = '1.405';
+$VERSION = '1.406';
 @ISA     = qw(Sys::Filesystem::Unix);
 
 sub version()
@@ -40,13 +40,13 @@ sub version()
     return $VERSION;
 }
 
-my @keys = qw(fs_spec fs_file fs_vfstype fs_mntops);
+my @keys       = qw(fs_spec fs_file fs_vfstype fs_mntops);
 my %special_fs = (
-                   swap   => 1,
-                   proc   => 1,
-                   devpts => 1,
-                   tmpfs  => 1,
-                 );
+    swap   => 1,
+    proc   => 1,
+    devpts => 1,
+    tmpfs  => 1,
+);
 my $mount_rx = qr/^\s*(.+?)\s+on\s+(\/.+?)\s+type\s+(\S+)\s+\((\S+)\)\s*$/;
 
 sub new
@@ -54,10 +54,13 @@ sub new
     ref( my $class = shift ) && croak 'Class name required';
     my %args = @_;
     my $self = bless( {}, $class );
+    $args{canondev} and $self->{canondev} = 1;
 
     local $/ = "\n";
     my @mounts = qx( mount );
     $self->readMounts( $mount_rx, [ 0, 1, 2 ], \@keys, \%special_fs, @mounts );
+
+    delete $self->{canondev};
 
     $self;
 }
@@ -147,7 +150,7 @@ Jens Rehsack <rehsack@cpan.org> - L<http://www.rehsack.de/>
 
 Copyright 2004,2005,2006 Nicola Worthington.
 
-Copyright 2008-2013 Jens Rehsack.
+Copyright 2008-2014 Jens Rehsack.
 
 This software is licensed under The Apache Software License, Version 2.0.
 
